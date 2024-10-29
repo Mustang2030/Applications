@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:dio/dio.dart';
 // import 'package:image_picker/image_picker.dart';
 
@@ -51,11 +50,8 @@ class HttpService {
 
       return response; // Return the full Response object, not just response.data
     } on DioException catch (e) {
-      log('DioException: ${e.response?.data}');
-      throw Exception("Dio error: ${e.message}");
-    } catch (e) {
-      log('Unexpected error: $e');
-      throw Exception('An unexpected error occurred');
+      log("${e.response?.data}");
+      throw Exception("${e.response?.data}");
     }
   }
 
@@ -85,6 +81,22 @@ class HttpService {
     }
   }
 
+  Future<Response> deleteRequest(String endpoint) async {
+    try {
+      log("Deleting data at $endpoint...");
+
+      Response response = await dio.delete(endpoint);
+
+      // Log the entire response for debugging purposes
+      log('Response received: ${response.data}');
+
+      return response; // Return the full Response object, not just response.data
+    } on DioException catch (e) {
+      log("${e.response?.data}");
+      throw Exception("${e.response?.data}");
+    }
+  }
+
   Future<Response> downloadRequest(
       String endpoint, Map<String, dynamic> data) async {
     try {
@@ -95,109 +107,31 @@ class HttpService {
     }
   }
 
-// Function to upload Excel data
-  Future<Response> uploadExcelData(
-    String endpoint,
-    List<Map<String, dynamic>> data,
-  ) async {
-    // Create a new Dio instance within the function to ensure immutability
-    Dio dioInstance = Dio();
-
-    try {
-      Response response = await dioInstance.post(
-        endpoint,
-        data: List<Map<String, dynamic>>.unmodifiable(
-            data), // Make data immutable
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-
-      return response;
-    } catch (e) {
-      log('Error: $e');
-      // Return a failed response
-      return Response(
-          statusCode: 500,
-          requestOptions: RequestOptions(path: endpoint),
-          statusMessage: 'Error during upload');
-    }
-  }
-
-// Function to upload an image file
-  Future<Response> uploadImageFile(File file, String endpoint) async {
-    Dio dioInstance = Dio(); // Create a new Dio instance for this method's use
-
-    try {
-      // Prepare form data with the file
-      var formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
-          file.path,
-          filename:
-              file.path.split('/').last, // Extract the file name from the path
-        ),
-      });
-
-      // Post the image file to the specified endpoint
-      Response response = await dioInstance.post(
-        endpoint,
-        data: formData,
-        options: Options(
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }, // Ensure multipart content type
-        ),
-      );
-
-      // Log success or failure based on the response status
-      if (response.statusCode == 200) {
-        log('Image uploaded successfully: ${response.data}');
-      } else {
-        log('Failed to upload image: ${response.statusCode} - ${response.statusMessage}');
-      }
-
-      // Return the response in both success and failure cases
-      return response;
-    } on DioException catch (dioError) {
-      // Catch Dio-specific errors, e.g., server issues, connectivity, timeouts
-      log('DioError during image upload: ${dioError.response}');
-      if (dioError.response?.data != null) {
-        log('DioError response data: ${dioError.response?.data}');
-      }
-      // Return the error response, if available
-      return dioError.response ??
-          Response(
-            statusCode: 500,
-            requestOptions: RequestOptions(path: endpoint),
-            statusMessage: 'DioError: ${dioError.message}',
-          );
-    } catch (e) {
-      // Catch any other general errors
-      log('Unexpected error during image upload: $e');
-      // Return a generic error response
-      return Response(
-        statusCode: 500,
-        requestOptions: RequestOptions(path: endpoint),
-        statusMessage: 'Error: $e',
-      );
-    }
-  }
-
   void _initializeInterceptors() {
     dio.interceptors.add(
       InterceptorsWrapper(
-        onError: (error, handler) {
-          log(' ${error.message}');
-          if (error.response != null) {
-            log('Error status code: ${error.response?.statusCode}');
-          }
-          handler.next(error);
-        },
-        onRequest: (request, handler) {
-          log("Request ${request.method} ${request.path}");
-          handler.next(request);
+        onRequest: (options, handler) {
+          // Log request data for debugging
+          log("Request to ${options.uri}");
+          log("Headers: ${options.headers}");
+          log("Data: ${options.data}"); // Logs sensitive data; handle carefully
+          handler.next(options);
         },
         onResponse: (response, handler) {
-          log('Response data: ${response.data}');
+          // Log response data
+          log("Response from ${response.requestOptions.uri}");
+          log("Status code: ${response.statusCode}");
+          log("Response data: ${response.data}"); // Logs sensitive data; handle carefully
           handler.next(response);
+        },
+        onError: (DioException error, handler) {
+          // Log errors
+          log("Error: ${error.message}");
+          if (error.response != null) {
+            log("Error status code: ${error.response?.statusCode}");
+            log("Error response data: ${error.response?.data}");
+          }
+          handler.next(error);
         },
       ),
     );

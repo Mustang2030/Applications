@@ -28,9 +28,11 @@ School _$SchoolFromJson(Map<String, dynamic> json) => School(
           ? null
           : Principal.fromJson(
               json['schoolPrincipalNP'] as Map<String, dynamic>),
-      schoolTeachersNP: (json['schoolTeachersNP'] as List<dynamic>?)
-          ?.map((e) => Teacher.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      schoolTeachersNP: json['schoolTeachersNP'] == null
+          ? null
+          : (json['schoolTeachersNP'] as List<dynamic>?)
+              ?.map((e) => Teacher.fromJson(e as Map<String, dynamic>))
+              .toList(),
       schoolAnnouncementNP: (json['schoolAnnouncementNP'] as List<dynamic>?)
           ?.map((e) => Announcement.fromJson(e as Map<String, dynamic>))
           .toList(),

@@ -6,32 +6,32 @@ import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
 import 'package:scs/models/announcement/announcement.dart';
-import 'package:scs/models/parent/parent.dart';
-import 'package:scs/models/principal/principal.dart';
+import 'package:scs/models/teacher/teacher.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
 
-class AnnouncementsPage extends StatefulWidget {
-  const AnnouncementsPage({super.key});
+class TeacherViewListAnnouncementsPage extends StatefulWidget {
+  const TeacherViewListAnnouncementsPage({super.key});
 
   @override
-  State<AnnouncementsPage> createState() => _AnnouncementsPageState();
+  State<TeacherViewListAnnouncementsPage> createState() =>
+      _TeacherViewListAnnouncementsPageState();
 }
 
-class _AnnouncementsPageState extends State<AnnouncementsPage> {
+class _TeacherViewListAnnouncementsPageState
+    extends State<TeacherViewListAnnouncementsPage> {
   late HttpService http;
 
   @override
   void initState() {
     super.initState();
     http = HttpService();
-    getPrincipal("Principal/GetPrincipalById?id=");
+    getTeacher("Teacher/GetTeacherById?id=");
   }
 
   bool isLoading = false;
-  Parent parent = Parent();
-  Principal principal = Principal();
+  Teacher teacher = Teacher();
   Announcement announcement = Announcement();
   List<Announcement> announcements = [];
 
@@ -50,7 +50,7 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
             color: kTextColor,
           ),
         ),
-        title: const Row(
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
@@ -58,9 +58,9 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
               color: kTextColor,
               size: 34,
             ),
-            SizedBox(width: 16),
+            SizedBox(width: 5),
             Text(
-              'Announcements',
+              'Total Announcements: ${announcements.length}',
               style: TextStyle(color: kTextColor),
             ),
           ],
@@ -98,13 +98,20 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                                 "${announcement.title}",
                             message: announcement.content ?? "No content",
                             seen: false,
-                            pending: principal.id != null
+                            pending: announcement.teacherID != null
                                 ? true
                                 : false, // You can manage the pending logic here
                             editIcon: IconButton(
-                                onPressed: () {}, icon: Icon(Icons.edit)),
+                                color: Colors.green,
+                                onPressed: () {},
+                                icon: Icon(Icons.edit)),
                             delIcon: IconButton(
-                                onPressed: () {}, icon: Icon(Icons.delete)),
+                                color: Colors.red,
+                                onPressed: () {
+                                  deleteAnnouncement(
+                                      announcement.announcementId);
+                                },
+                                icon: Icon(Icons.delete)),
                           ),
                         );
                       },
@@ -114,28 +121,37 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
     );
   }
 
-  Future<void> getPrincipal(String url) async {
+  Future<void> getTeacher(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
-    log('Fetching principal');
+
     try {
       setState(() {
         isLoading = true;
       });
-
+      log("fetching data...");
       Response response = await http.getRequest("${http.baseUrl}$url$token");
 
-      if (response.statusCode == 200) {
+      log("responseCode for get teacher: ${response.statusCode}");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         var result = response.data['Result'];
-        if (response.data['Success'] == true) {
-          setState(() {
-            principal = Principal.fromJson(result);
-            log("Mapped Principal: Name: ${principal.name}");
-          });
-          await getAnnouncements(
-              "Announcement/GetAllAnnBySchool?schoolId=${principal.schoolID}");
-        }
+
+        setState(() {
+          teacher = Teacher.fromJson(result);
+          // for( var group in teacher.groupNP)
+
+          log("Mapped teacher: Name: ${teacher.name}, Email: ${teacher.emailAddress}, ID: ${teacher.id}");
+          isLoading = false;
+        });
+        await getAnnouncements(
+            "Announcement/GetAnnouncementsByTeacherId?id=${teacher.id}");
+      } else {
+        log("Full response: ${response.toString()}");
+        log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
+        setState(() {
+          isLoading = false;
+        });
       }
-    } catch (e) {
+    } on Exception catch (e) {
       log("Error occurred: $e");
     } finally {
       setState(() {
@@ -177,6 +193,26 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> deleteAnnouncement(int? id) async {
+    try {
+      Response response = await http.deleteRequest(
+          "${http.baseUrl}Announcement/Delete?announcementId=$id");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        log("Announcement made");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Announcement has been deleted"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await getAnnouncements(
+            "Announcement/GetAnnouncementsByTeacherId?id=${teacher.id}");
+      }
+    } on DioException catch (e) {
+      log("Put me into your blody arms${e.response!.data}");
     }
   }
 }

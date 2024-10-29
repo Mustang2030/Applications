@@ -70,6 +70,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 20),
                     StyledFormField(
                       controller: emailAddressController,
+                      validator: validateEmail,
                       textStyle: const TextStyle(color: Colors.white),
                       decoration: formS(
                         "Email",
@@ -193,6 +194,7 @@ class _LoginState extends State<Login> {
 
         if (data['Success'] == true) {
           log("Login success response received");
+          errorMessage = "";
 
           // Check if the user needs to reset their password
           if (data['ResetPassword']) {
@@ -204,12 +206,15 @@ class _LoginState extends State<Login> {
             // Extract the token and set it in LoginProvider
             String token = data['ActorID'].toString(); // Updated to String
             log("Received token: $token");
-
+            String userRole = data['Role'].toString(); // Updated to String
+            log("Received role: $userRole");
             // Ensure the user and token are set before navigating
             Provider.of<LoginProvider>(context, listen: false).setUser(
               user = User.fromJson(vdata),
               token,
             );
+            Provider.of<LoginProvider>(context, listen: false)
+                .loggedRole(userRole);
             log("User and token successfully set in LoginProvider");
 
             // Now navigate based on the user's role

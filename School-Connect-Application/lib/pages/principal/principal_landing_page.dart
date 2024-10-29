@@ -80,10 +80,10 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
                         RouteManagerProvider.viewProfile),
                     const SizedBox(height: 15),
                     _buildButton(context, 'Make Announcements',
-                        RouteManagerProvider.makeAnnouncements),
+                        RouteManagerProvider.principalMakeAnnounce),
                     const SizedBox(height: 15),
                     _buildButton(context, 'View Announcements',
-                        RouteManagerProvider.viewAnnouncements),
+                        RouteManagerProvider.principalListAnnounce),
                     const SizedBox(height: 15),
                     _buildButton(
                         context, 'Grades', RouteManagerProvider.gradeView),
@@ -91,7 +91,7 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
                     // Logout Button
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        logOut();
                       },
                       child: Container(
                         padding: const EdgeInsets.all(12),
@@ -153,6 +153,7 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
 
   Future<void> getUser(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
+
     log('Role registration page');
     log('current token $token');
     try {
@@ -181,6 +182,23 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> logOut() async {
+    try {
+      Response response = await http.postRequest(
+          "${http.baseUrl}SignIn/SignOut", principal.toJson());
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Logged out"),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      log("Exception while login out: $e");
     }
   }
 }

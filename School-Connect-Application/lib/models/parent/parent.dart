@@ -32,6 +32,7 @@ class Parent extends BaseActor {
     super.name,
     super.surname,
     super.gender,
+    super.profileImageFile,
     super.role,
     super.title,
     this.idNo,

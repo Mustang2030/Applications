@@ -26,6 +26,7 @@ class _ChildProfileState extends State<ChildProfile> {
   Learner learner = Learner(parents: []);
   LearnerParent learnerParent = LearnerParent();
   School school = School();
+  List<String> subjects = [];
 
   @override
   void initState() {
@@ -74,19 +75,28 @@ class _ChildProfileState extends State<ChildProfile> {
                       Container(
                         width: 350,
                         decoration: BoxDecoration(
+                            color: const Color(0xFF0F2E34),
                             border: Border.all(),
                             borderRadius: BorderRadius.circular(8)),
                         child: Column(
                           children: [
-                            Text(
-                                "CLASS TEACHER: KGOPOLO MOOI\nSUBJECTS: ${learner.subjects}"),
+                            // Place the loop here
+                            for (final sub in subjects) ...[
+                              Text(
+                                sub,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              )
+                            ]
+                            // Text(
+                            //     "CLASS TEACHER: KGOPOLO MOOI\nSUBJECTS: ${learner.subjects}"),
                           ],
                         ),
                       ),
                       const SizedBox(height: 10),
                       rslButton(context, "ANNOUNCEMENTS", () {
-                        Navigator.pushNamed(
-                            context, RouteManagerProvider.viewAnnouncements);
+                        Navigator.pushNamed(context,
+                            RouteManagerProvider.parentViewListAnnouncemnt);
                       }),
                       rslButton(context, "REPORT CARD", () {
                         Navigator.pushNamed(
@@ -100,12 +110,12 @@ class _ChildProfileState extends State<ChildProfile> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(400, 0, 0, 30),
+                  padding: const EdgeInsets.fromLTRB(350, 0, 0, 30),
                   child: FloatingActionButton(
-                      backgroundColor: Colors.grey,
+                      backgroundColor: const Color(0xFF0F2E34),
                       child: const Icon(
                         Icons.chat,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                       onPressed: () {
                         Navigator.pushNamed(
@@ -168,19 +178,21 @@ class _ChildProfileState extends State<ChildProfile> {
       Response response = await http.getRequest("${http.baseUrl}$url$token");
 
       if (response.statusCode == 200) {
-        var result = response.data;
+        var result = response.data["Result"];
 
         setState(() {
           parent = Parent.fromJson(result);
           learner = Learner.fromJson(result);
           learnerParent = LearnerParent.fromJson(result);
+
           // Set values to controllers after data is fetched
           // nameController.text = parent.name ?? '';
           // surnameController.text = parent.surname ?? '';
           // emailController.text = parent.emailAddress ?? '';
           // phoneController.text = parent.phoneNumber?.toString() ??
           //     ''; // Handle null numbers
-
+          subjects = learner.subjects!;
+          // Provide.of<LoginProvider>(context, listen: false).
           log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
           isLoading = false;
         });

@@ -8,14 +8,14 @@ part of 'group.dart';
 
 Group _$GroupFromJson(Map<String, dynamic> json) => Group(
       groupId: (json['groupId'] as num).toInt(),
-      groupMembersIDs: (json['groupMembersIDs'] as List<dynamic>)
-          .map((e) => (e as num).toInt())
+      groupMemberIDs: (json['groupMemberIDs'] as List<dynamic>?)
+          ?.map((e) => e as String)
           .toList(),
       groupName: json['groupName'] as String,
     );
 
 Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{
       'groupId': instance.groupId,
-      'groupMembersIDs': instance.groupMembersIDs,
+      'groupMemberIDs': instance.groupMemberIDs,
       'groupName': instance.groupName,
     };

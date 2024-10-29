@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 String? validateEmail(String? value) {
   if (value == null || value.isEmpty) {
     return 'please enter your email address';
@@ -43,4 +45,17 @@ String? validateId(String? value) {
     return "Please enter a correct ID number";
   }
   return null;
+}
+
+String handleDioError(DioException dioError) {
+  if (dioError.response != null) {
+    // Check if we have a specific error message in the response
+    if (dioError.response?.data is Map<String, dynamic>) {
+      return dioError.response?.data['message'] ?? 'An error occurred';
+    }
+    return dioError.response?.statusMessage ?? 'Unknown network error';
+  } else {
+    // Handle errors without a response (like timeouts or network issues)
+    return dioError.message ?? 'Network error occurred';
+  }
 }

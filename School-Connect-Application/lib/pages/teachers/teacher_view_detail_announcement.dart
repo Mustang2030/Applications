@@ -8,20 +8,22 @@ import 'package:scs/models/announcement/announcement.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/services/http_service.dart';
 
-class DetailAnnounce extends StatefulWidget {
-  const DetailAnnounce({super.key});
+class TeacherViewDetailAnnounce extends StatefulWidget {
+  const TeacherViewDetailAnnounce({super.key});
 
   @override
-  State<DetailAnnounce> createState() => _DetailAnnounceState();
+  State<TeacherViewDetailAnnounce> createState() =>
+      _TeacherViewDetailAnnounceState();
 }
 
-class _DetailAnnounceState extends State<DetailAnnounce> {
+class _TeacherViewDetailAnnounceState extends State<TeacherViewDetailAnnounce> {
   late HttpService http;
   bool isLoading = false;
   @override
   void initState() {
     super.initState();
     http = HttpService();
+
     getAnnouncement();
   }
 

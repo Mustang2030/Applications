@@ -1,6 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
@@ -17,7 +19,11 @@ class ParentProfile extends StatefulWidget {
 
 class _ParentProfileState extends State<ParentProfile> {
   //Add a key and form validator on submission
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
+
+  // For Images
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
 
   TextEditingController profilepicController = TextEditingController();
   TextEditingController staffNrController = TextEditingController();
@@ -59,25 +65,24 @@ class _ParentProfileState extends State<ParentProfile> {
         ),
         backgroundColor: const Color(0xFF0F2E34),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildProfileHeader(),
-              const SizedBox(height: 24),
-              _buildCombinedProfileCard(),
-              const SizedBox(height: 24),
-              Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: rslButton(context, "Save Changes", () {
-                    updateUser();
-                  })),
-            ],
-          ),
-        ),
-      ),
+      body: isLoading
+          ? const CircularProgressIndicator()
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildProfileHeader(),
+                    const SizedBox(height: 24),
+                    _buildCombinedProfileCard(),
+                    const SizedBox(height: 24),
+
+                    //this is where it ends for sysAd
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -141,20 +146,20 @@ class _ParentProfileState extends State<ParentProfile> {
             _buildProfileRow("Parent Type", "${parentMod.parentType}"),
 
             StyledFormField(
+              controller: phoneController,
+              decoration: formS("Phone Number",
+                  "You can change your phone numeber here", Icons.email,
+                  iconColor: Color(0xFF0F2E34)),
+            ),
+            StyledFormField(
               controller: emailController,
               decoration: formS(
                   "Email", "You can change your email here", Icons.email,
                   iconColor: Color(0xFF0F2E34)),
             ),
-            StyledFormField(
-              controller: phoneController,
-              decoration: formS("Phone Number",
-                  "You can change your phone numeber here", Icons.email,
-                  iconColor: Color(0xFF0F2E34)),
-            )
-            // _buildEditableRow("Password", _passwordController,
-            //     _isEditingPassword, _enableEditing, "password",
-            //     isPassword: true),
+            rslButton(context, "Update", () {
+              updateUser();
+            })
           ],
         ),
       ),
@@ -218,32 +223,58 @@ class _ParentProfileState extends State<ParentProfile> {
 
   Future<void> updateUser() async {
     try {
-      if (_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+
+      FormData formData = FormData.fromMap({
+        'id': parentMod.id,
+        'title': parentMod.title,
+        'profileImage': parentMod.profileImage,
+        'name': parentMod.name,
+        'surname': parentMod.surname,
+        'gender': parentMod.gender,
+        'role': parentMod.role,
+        'idNo': parentMod.idNo,
+        'parentType': parentMod.parentType,
+        'emailAddress': emailController.text,
+        'phoneNumber': phoneController.text,
+        if (_selectedImage != null) ...{
+          'profileImageFile': await MultipartFile.fromFile(
+            _selectedImage!.path,
+            filename: _selectedImage?.path.split('/').last,
+          ),
+        },
+      });
+
+      log("Request payload: $formData");
+
+      // Send HTTP PUT request
+      Response response =
+          await http.putRequest("${http.baseUrl}Parent/Update", formData);
+      log("This is the status code: ${response.statusCode}");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         setState(() {
-          isLoading = true;
+          isLoading = false;
         });
-
-        log("Request payload: ${parentMod.toJson()}");
-
-        // Send HTTP PUT request
-        Response response = await http.putRequest(
-            "${http.baseUrl}parentMod/UpdateparentMod", parentMod.toJson());
-
-        if (response.statusCode == 200) {
-          var result = response.data['Result'];
-          setState(() {
-            parentMod = Parent.fromJson(result);
-            log("Mapped parentMod: Name: ${parentMod.name}, Email: ${parentMod.emailAddress}, ID: ${parentMod.id}");
-            isLoading = false;
-          });
-        } else if (response.statusCode == 400) {
-          log("Error 400: ${response.data['Result']}");
-        } else {
-          log("Failed to update user, statusCode: ${response.statusCode}, message: ${response.statusMessage}");
-          setState(() {
-            isLoading = false;
-          });
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Profile updated successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else if (response.statusCode! >= 400 && response.statusCode! < 500) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to update profile"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        log("Failed to update user, statusCode: ${response.statusCode}, message: ${response.statusMessage}");
+        setState(() {
+          isLoading = false;
+        });
       }
     } on DioException catch (dioError) {
       log("DioError occurred: $dioError");
@@ -254,6 +285,16 @@ class _ParentProfileState extends State<ParentProfile> {
       log("An unexpected error occurred: $e");
       setState(() {
         isLoading = false;
+      });
+    }
+  }
+
+  // Image picker function
+  Future<void> pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path); // Get the correct mobile path
       });
     }
   }

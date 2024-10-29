@@ -20,11 +20,6 @@ class ProfileViewS extends StatefulWidget {
 }
 
 class _ProfileViewSState extends State<ProfileViewS> {
-  bool _isEditingCell = false;
-  bool _isEditingEmail = false;
-  bool _isEditingPassword = false;
-  bool _isPasswordVisible = false;
-
   // For Images
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
@@ -45,18 +40,8 @@ class _ProfileViewSState extends State<ProfileViewS> {
   final TextEditingController _cellController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  void _togglePasswordVisibility() {
-    setState(() {
-      _isPasswordVisible = !_isPasswordVisible;
-    });
-  }
-
   void _saveChanges() {
-    setState(() {
-      _isEditingCell = false;
-      _isEditingEmail = false;
-      _isEditingPassword = false;
-    });
+    setState(() {});
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Changes saved successfully!')),
@@ -83,32 +68,22 @@ class _ProfileViewSState extends State<ProfileViewS> {
         ),
         backgroundColor: const Color(0xFF0F2E34),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildProfileHeader(),
-              const SizedBox(height: 24),
-              _buildCombinedProfileCard(),
-              const SizedBox(height: 24),
-              if (_isEditingCell || _isEditingEmail || _isEditingPassword)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F2E34),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text("Save Changes"),
-                  ),
+      body: isLoading
+          ? Center(child: const CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildProfileHeader(),
+                    const SizedBox(height: 24),
+                    _buildCombinedProfileCard(),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 
@@ -216,66 +191,7 @@ class _ProfileViewSState extends State<ProfileViewS> {
     );
   }
 
-  Widget _buildEditableRow(String label, TextEditingController controller,
-      bool isEditing, Function enableEditing, String field,
-      {bool isPassword = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF0F2E34))),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  readOnly: !isEditing,
-                  obscureText: isPassword && !_isPasswordVisible,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    filled: true,
-                    fillColor: isEditing ? Colors.white : Colors.grey[200],
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 16),
-                    hintText: !isEditing
-                        ? (isPassword ? '**********' : controller.text)
-                        : null,
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF0F2E34)),
-                    ),
-                  ),
-                ),
-              ),
-              if (isPassword && isEditing)
-                IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: const Color(0xFF0F2E34),
-                  ),
-                  onPressed: _togglePasswordVisibility,
-                ),
-              if (!isEditing)
-                TextButton(
-                  onPressed: () => enableEditing(field),
-                  child: const Text("Edit",
-                      style: TextStyle(color: Color(0xFF0F2E34))),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
+// Get system admin information
   Future<void> getUser(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
     log('Role registration page');
@@ -292,8 +208,9 @@ class _ProfileViewSState extends State<ProfileViewS> {
         if (response.data['Success'] == true) {
           setState(() {
             systemAdmin = SystemAdmin.fromJson(result);
-            _emailController.text = systemAdmin.emailAddress!;
+
             _cellController.text = systemAdmin.phoneNumber.toString();
+            _emailController.text = systemAdmin.emailAddress!;
 
             // Set values to controllers after data is fetched
 
@@ -311,6 +228,7 @@ class _ProfileViewSState extends State<ProfileViewS> {
     }
   }
 
+// Update system admin
   Future<void> updateUser() async {
     try {
       setState(() {
@@ -318,19 +236,21 @@ class _ProfileViewSState extends State<ProfileViewS> {
       });
 
       FormData formData = FormData.fromMap({
+        'id': systemAdmin.id,
         'name': systemAdmin.name,
         'surname': systemAdmin.surname,
         'role': systemAdmin.role,
         'title': systemAdmin.title,
         'gender': systemAdmin.gender,
         'staffNr': systemAdmin.staffNr,
-        'id': systemAdmin.id,
         'emailAddress': _emailController.text,
         'phoneNumber': _cellController.text,
-        'profileImageFile': await MultipartFile.fromFile(
-          _selectedImage!.path,
-          filename: _selectedImage!.path.split('/').last,
-        ),
+        if (_selectedImage != null) ...{
+          'profileImageFile': await MultipartFile.fromFile(
+            _selectedImage!.path,
+            filename: _selectedImage?.path.split('/').last,
+          ),
+        },
       });
 
       log("Request payload: $formData");
@@ -340,26 +260,22 @@ class _ProfileViewSState extends State<ProfileViewS> {
           "${http.baseUrl}SystemAdmin/UpdateSystemAdmin", formData);
       log("This is the status code: ${response.statusCode}");
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("You have successfully updated your profile"),
+          SnackBar(
+            content: Text("Profile updated successfully"),
+            backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context);
-        // var result = response.data;
-        // setState(() {
-        //   systemAdmin = SystemAdmin.fromJson(result);
-        //   log("Mapped SystemAdmin: Name: ${systemAdmin.name}, Email: ${systemAdmin.emailAddress}, ID: ${systemAdmin.id}");
-        //   isLoading = false;
-        // });
-      } else if (response.statusCode == 400) {
+      } else if (response.statusCode! >= 400 && response.statusCode! < 500) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text("Failed to update profile"),
+            backgroundColor: Colors.red,
           ),
         );
-        Navigator.pop(context);
-        log("Error 400: ${response.data}");
       } else {
         log("Failed to update user, statusCode: ${response.statusCode}, message: ${response.statusMessage}");
         setState(() {

@@ -12,14 +12,16 @@ import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
 
-class AnnouncementsPage extends StatefulWidget {
-  const AnnouncementsPage({super.key});
+class PrincipalListAnnouncementsPage extends StatefulWidget {
+  const PrincipalListAnnouncementsPage({super.key});
 
   @override
-  State<AnnouncementsPage> createState() => _AnnouncementsPageState();
+  State<PrincipalListAnnouncementsPage> createState() =>
+      _PrincipalListAnnouncementsPageState();
 }
 
-class _AnnouncementsPageState extends State<AnnouncementsPage> {
+class _PrincipalListAnnouncementsPageState
+    extends State<PrincipalListAnnouncementsPage> {
   late HttpService http;
 
   @override
@@ -50,7 +52,7 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
             color: kTextColor,
           ),
         ),
-        title: const Row(
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
@@ -58,9 +60,9 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
               color: kTextColor,
               size: 34,
             ),
-            SizedBox(width: 16),
+            SizedBox(width: 5),
             Text(
-              'Announcements',
+              'Total Announcements: ${announcements.length}',
               style: TextStyle(color: kTextColor),
             ),
           ],
@@ -98,13 +100,20 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                                 "${announcement.title}",
                             message: announcement.content ?? "No content",
                             seen: false,
-                            pending: principal.id != null
+                            pending: announcement.principalID != null
                                 ? true
                                 : false, // You can manage the pending logic here
                             editIcon: IconButton(
-                                onPressed: () {}, icon: Icon(Icons.edit)),
+                                color: Colors.green,
+                                onPressed: () {},
+                                icon: Icon(Icons.edit)),
                             delIcon: IconButton(
-                                onPressed: () {}, icon: Icon(Icons.delete)),
+                                color: Colors.red,
+                                onPressed: () {
+                                  deleteAnnouncement(
+                                      announcement.announcementId);
+                                },
+                                icon: Icon(Icons.delete)),
                           ),
                         );
                       },
@@ -177,6 +186,26 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> deleteAnnouncement(int? id) async {
+    try {
+      Response response = await http.deleteRequest(
+          "${http.baseUrl}Announcement/Delete?announcementId=$id");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        log("Announcement made");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Announcement has been deleted"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await getAnnouncements(
+            "Announcement/GetAllAnnBySchool?schoolId=${principal.schoolID}");
+      }
+    } on DioException catch (e) {
+      log("Put me into your blody arms${e.response!.data}");
     }
   }
 }

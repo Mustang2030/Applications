@@ -39,7 +39,7 @@ class _TeacherDetailsState extends State<TeacherDetails> {
   @override
   void initState() {
     http = HttpService();
-    getUser("Teacher/GetTeacherById?id=");
+    getTeacher("Teacher/GetTeacherById?id=");
     super.initState();
   }
 
@@ -145,9 +145,10 @@ class _TeacherDetailsState extends State<TeacherDetails> {
               ),
             ),
             const SizedBox(height: 16),
+            _buildProfileRow("Title", "${teacher.title}"),
             _buildProfileRow("Name", "${teacher.name}"),
             _buildProfileRow("Surname", "${teacher.surname}"),
-            // _buildProfileRow("Identity Number", "${principal.idNo}"),
+            _buildProfileRow("Gender", "${teacher.gender}"),
             _buildProfileRow("Staff No", "${teacher.staffNr}"),
             _buildProfileRow(
                 "Emis No", "${teacher.teacherSchoolNP?.emisNumber}"),
@@ -193,67 +194,7 @@ class _TeacherDetailsState extends State<TeacherDetails> {
     );
   }
 
-  Widget _buildEditableRow(String label, TextEditingController controller,
-      bool isEditing, Function enableEditing, String field,
-      {bool isPassword = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF0F2E34))),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  readOnly: !isEditing,
-                  obscureText: isPassword && !_isPasswordVisible,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    filled: true,
-                    fillColor: isEditing ? Colors.white : Colors.grey[200],
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 16),
-                    hintText: !isEditing
-                        ? (isPassword ? '**********' : controller.text)
-                        : null,
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF0F2E34)),
-                    ),
-                  ),
-                ),
-              ),
-              if (isPassword && isEditing)
-                IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: const Color(0xFF0F2E34),
-                  ),
-                  onPressed: _togglePasswordVisibility,
-                ),
-              if (!isEditing)
-                TextButton(
-                  onPressed: () => enableEditing(field),
-                  child: const Text("Edit",
-                      style: TextStyle(color: Color(0xFF0F2E34))),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> getUser(String url) async {
+  Future<void> getTeacher(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
 
     try {
@@ -263,23 +204,19 @@ class _TeacherDetailsState extends State<TeacherDetails> {
       log("fetching data...");
       Response response = await http.getRequest("${http.baseUrl}$url$token");
 
+      log("responseCode for get teacher: ${response.statusCode}");
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-        var result = response.data;
+        var result = response.data['Result'];
 
         setState(() {
           teacher = Teacher.fromJson(result);
-          // Set values to controllers after data is fetched
-          staffNrController.text = teacher.staffNr.toString();
-          nameController.text = teacher.name!;
-          surnameController.text = teacher.surname!;
-          emailController.text = teacher.emailAddress!;
-          phoneController.text =
-              teacher.phoneNumber.toString(); // Handle null numbers
+          // for( var group in teacher.groupNP)
 
-          log("Mapped SystemAdmin: Name: ${teacher.name}, Email: ${teacher.emailAddress}, ID: ${teacher.id}");
+          log("Mapped teacher: Name: ${teacher.name}, Email: ${teacher.emailAddress}, ID: ${teacher.id}");
           isLoading = false;
         });
       } else {
+        log("Full response: ${response.toString()}");
         log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
         setState(() {
           isLoading = false;

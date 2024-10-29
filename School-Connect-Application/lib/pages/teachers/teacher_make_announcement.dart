@@ -1,40 +1,37 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
 import 'package:scs/misc/pickers.dart';
 import 'package:scs/models/announcement/announcement.dart';
+import 'package:scs/models/group/group.dart';
 import 'package:scs/models/principal/principal.dart';
 import 'package:scs/models/teacher/teacher.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/services/http_service.dart'; // Import this package for formatting dates
 
-class MakeSchoolAnnouncementPage extends StatefulWidget {
-  const MakeSchoolAnnouncementPage({super.key});
+class TeacherMakeSchoolAnnouncementPage extends StatefulWidget {
+  const TeacherMakeSchoolAnnouncementPage({super.key});
 
   @override
-  State<MakeSchoolAnnouncementPage> createState() =>
-      _MakeSchoolAnnouncementPage();
+  State<TeacherMakeSchoolAnnouncementPage> createState() =>
+      _TeacherMakeSchoolAnnouncementPage();
 }
 
-class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
+class _TeacherMakeSchoolAnnouncementPage
+    extends State<TeacherMakeSchoolAnnouncementPage> {
   late HttpService http;
 
   @override
   void initState() {
     http = HttpService();
-    fetchData();
+    getTeacher("Teacher/GetTeacherById?id=");
     super.initState();
-  }
-
-  Future<void> fetchData() async {
-    if (principal != null) {
-      await getPrincipal("Principal/GetPrincipalById?id=");
-    } else if (teacher != null) {
-      await getTeacher("Teacher/GetTeacherById?id=");
-    }
   }
 
   TextEditingController titleController = TextEditingController();
@@ -44,6 +41,8 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
   bool scheduleAn = false;
   DateTime? dateTime;
   DateTime? datePicked;
+  late List<Group> groups = [];
+  String selectedGroupNames = "";
 
   String selectedRecipients = "All Parents";
   String errorMessage = "";
@@ -71,7 +70,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
           ),
         ),
         title: Text(
-          "${principal.principalSchoolNP?.name} ${principal.principalSchoolNP?.type} Announcements",
+          "${teacher.teacherSchoolNP?.name} ${teacher.teacherSchoolNP?.type} Announcements",
           style: TextStyle(color: kTextColor, fontSize: kTitleFontSize),
         ),
         backgroundColor: const Color(0xFF0F2E34),
@@ -84,9 +83,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              if (actorRole == "Principal") ...[
-                Text("You can make an announcement here: ${principal.name}")
-              ],
+              Text("${teacher.role} Make Announcement"),
               const Text(
                 "Title:",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -102,49 +99,40 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              StyledFormField(
-                isDropdown: true,
-                selectedItem: selectedRecipients,
-                dropdownItems: [
-                  if (teacher.teacherSchoolNP!.type == "Primary") ...[
-                    "All Parents",
-                    "Grade 1",
-                    "Grade 2",
-                    "Grade 3",
-                    "Grade 4",
-                    "Grade 5",
-                    "Grade 6",
-                    "Grade 7",
-                  ] else if (teacher.teacherSchoolNP!.type == "High") ...[
-                    "All Parents",
-                    "Grade 8",
-                    "Grade 9",
-                    "Grade 10",
-                    "Grade 11",
-                    "Grade 12"
-                  ] else if (teacher.teacherSchoolNP!.type == "Combined") ...[
-                    "All Parents",
-                    "Grade 1",
-                    "Grade 2",
-                    "Grade 3",
-                    "Grade 4",
-                    "Grade 5",
-                    "Grade 6",
-                    "Grade 7",
-                    "Grade 8",
-                    "Grade 9",
-                    "Grade 10",
-                    "Grade 11",
-                    "Grade 12"
-                  ]
-                ],
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (selectedR) {
-                  selectedRecipients = selectedR;
+
+              // Column(
+              //   children: [
+              //     for (var grp in groups) ...[
+              //       Text("${grp.groupName}"),
+              //     ]
+              //   ],
+              // ),
+
+              MultiSelectDialogField(
+                buttonIcon: const Icon(Icons.book),
+                buttonText: const Text("Recipients"),
+                searchable: true,
+                isDismissible: true,
+                selectedColor: Colors.black87,
+                listType: MultiSelectListType.LIST,
+                items: groups
+                    .map(
+                        (group) => MultiSelectItem(group, "${group.groupName}"))
+                    .toList(),
+                onConfirm: (values) {
+                  setState(() {
+                    selectedGroupNames = values
+                        .map((group) => (group).groupName ?? "")
+                        .join(", ");
+                  });
                 },
+                title: const Text("Select groups"),
+                decoration: const BoxDecoration(
+                  color: Colors.black38,
+                  borderRadius: BorderRadius.all(Radius.circular(9)),
+                ),
               ),
+
               const SizedBox(height: 20),
               const Text(
                 "Message:",
@@ -222,41 +210,22 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(120, 0, 120, 0),
                 child: rslButton(context, "SEND", () {
-                  if (actorRole == "Principal") {
-                    setState(() {
-                      announcement = Announcement(
-                        announcementId: 0,
-                        title: titleController.text,
-                        recipients: [selectedRecipients],
-                        content: messageController.text,
-                        sendEmail: sendE,
-                        sendSMS: sendSms,
-                        scheduleForLater: scheduleAn,
-                        timeToPost: DateTime.now(),
-                        principalID: principal.id,
-                        teacherID: null,
-                        schoolID: principal.schoolID,
-                        dateCreated: DateTime.now(),
-                      );
-                    });
-                  } else if (actorRole == "Teacher") {
-                    setState(() {
-                      announcement = Announcement(
-                        announcementId: 0,
-                        title: titleController.text,
-                        recipients: [selectedRecipients],
-                        content: messageController.text,
-                        sendEmail: sendE,
-                        sendSMS: sendSms,
-                        scheduleForLater: scheduleAn,
-                        timeToPost: DateTime.now(),
-                        principalID: null,
-                        teacherID: teacher.id,
-                        schoolID: teacher.schoolID,
-                        dateCreated: DateTime.now(),
-                      );
-                    });
-                  }
+                  setState(() {
+                    announcement = Announcement(
+                      announcementId: 0,
+                      title: titleController.text,
+                      recipients: [selectedGroupNames],
+                      content: messageController.text,
+                      sendEmail: sendE,
+                      sendSMS: sendSms,
+                      scheduleForLater: scheduleAn,
+                      timeToPost: DateTime.now(),
+                      principalID: null,
+                      teacherID: teacher.id,
+                      schoolID: teacher.schoolID,
+                      dateCreated: DateTime.now(),
+                    );
+                  });
 
                   createAnnouncement();
                 }),
@@ -280,6 +249,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Announcement has been made"),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context);
@@ -287,6 +257,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to make announcement"),
+            backgroundColor: Colors.red,
           ),
         );
         Navigator.pop(context);
@@ -308,38 +279,6 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
     }
   }
 
-  Future<void> getPrincipal(String url) async {
-    String? token = Provider.of<LoginProvider>(context, listen: false).token;
-    log('Role registration page');
-    log('current token $token');
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      log("fetching data...");
-      Response response = await http.getRequest("${http.baseUrl}$url$token");
-
-      if (response.statusCode == 200) {
-        var result = response.data['Result'];
-        if (response.data['Success'] == true) {
-          setState(() {
-            principal = Principal.fromJson(result);
-            actorRole = "${principal.role! ?? ""}";
-
-            log("Mapped SystemAdmin: Name: ${principal.name}, Email: ${principal.emailAddress}, School Name: ${principal.principalSchoolNP!.name}");
-            isLoading = false;
-          });
-        }
-      }
-    } on Exception catch (e) {
-      log("Error occurred: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   Future<void> getTeacher(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
     log('Role registration page');
@@ -351,17 +290,25 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
       });
       log("fetching data...");
       Response response = await http.getRequest("${http.baseUrl}$url$token");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        var result = response.data['Result'];
+        if (response.data['Success'] == true) {
+          setState(() {
+            teacher = Teacher.fromJson(result);
 
-      if (response.statusCode == 200) {
-        setState(() {
-          teacher = Teacher.fromJson(response.data);
-          actorRole = "${teacher.role ?? ""}";
+            // groups =
+            //     List<Group>.from(result.map((json) => Group.fromJson(json)));
 
-          // Set values to controllers after data is fetched
+            groups = teacher.teacherSchoolNP!.schoolGroupsNP!;
 
-          log("Mapped SystemAdmin: Name: ${teacher.name}, Email: ${teacher.emailAddress}, School Name: ${teacher.teacherSchoolNP?.name}");
-          isLoading = false;
-        });
+            // for (var grp in groups) {
+            //   grp.groupName;W
+            // }
+
+            log("Mapped SystemAdmin: Name: ${teacher.name}, Email: ${teacher.emailAddress}, School Name: ${teacher.teacherSchoolNP?.name}");
+            isLoading = false;
+          });
+        }
       }
     } on Exception catch (e) {
       log("Error occurred: $e");

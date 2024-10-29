@@ -11,6 +11,8 @@ class DatePickerM extends StatefulWidget {
 }
 
 class _DatePickerMState extends State<DatePickerM> {
+  DateTime selectedDateTime =
+      DateTime.now(); // Initialize with current date and time
   late DateTime _selectedDate;
 
   @override

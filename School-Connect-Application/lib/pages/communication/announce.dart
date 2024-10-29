@@ -47,7 +47,7 @@ class _AnnouncementsState extends State<Announcements> {
 
   @override
   Widget build(BuildContext context) {
-    String? token = Provider.of<LoginProvider>(context, listen: false).token;
+    // String? token = Provider.of<LoginProvider>(context, listen: false).token;
 
     return Scaffold(
       //Make Announcements

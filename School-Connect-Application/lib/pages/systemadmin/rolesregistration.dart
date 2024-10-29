@@ -593,41 +593,42 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                       classCode = mainCl;
                                     });
                                   },
-                                  decoration: formS("Main Class",
+                                  decoration: formS("Class Code",
                                       "Select Main Class", Icons.school,
                                       iconColor: const Color(0xFF0F2E34)),
                                 ),
-                                MultiSelectDialogField(
-                                  buttonIcon: const Icon(Icons.book),
-                                  buttonText: const Text("Subjects Taught"),
-                                  searchable: true,
-                                  isDismissible: true,
-                                  selectedColor: Colors.black87,
-                                  items: [
-                                    MultiSelectItem("English", "English"),
-                                    MultiSelectItem(
-                                        "Mathematics", "Mathematics"),
-                                    MultiSelectItem(
-                                        "Social Sciences", "Social Sciences"),
-                                    MultiSelectItem("Economics", "Economics"),
-                                    MultiSelectItem("Afrikaans", "Afrikaans"),
-                                    MultiSelectItem(
-                                        "Life Orientation", "Life Orientation"),
-                                    MultiSelectItem(
-                                        "Life Skills", "Life Skills"),
-                                  ],
-                                  onConfirm: (values) {
-                                    setState(() {
-                                      subjectList = values;
-                                    });
-                                  },
-                                  title: const Text("Select Subjects"),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black38,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(9)),
-                                  ),
-                                ),
+                                // MultiSelectDialogField(
+                                //   buttonIcon: const Icon(Icons.book),
+                                //   buttonText: const Text("Subjects Taught"),
+                                //   searchable: true,
+                                //   isDismissible: true,
+                                //   selectedColor: Colors.black87,
+                                //   items: [
+                                //     MultiSelectItem("English", "English"),
+                                //     MultiSelectItem(
+                                //         "Mathematics", "Mathematics"),
+                                //     MultiSelectItem(
+                                //         "Social Sciences", "Social Sciences"),
+                                //     MultiSelectItem("Economics", "Economics"),
+                                //     MultiSelectItem("Afrikaans", "Afrikaans"),
+                                //     MultiSelectItem(
+                                //         "Life Orientation", "Life Orientation"),
+                                //     MultiSelectItem(
+                                //         "Life Skills", "Life Skills"),
+                                //   ],
+                                //   onConfirm: (values) {
+                                //     setState(() {
+                                //       subjectList = values;
+                                //     });
+                                //   },
+                                //   title: const Text("Select Subjects"),
+                                //   decoration: const BoxDecoration(
+                                //     color: Colors.black38,
+                                //     borderRadius:
+                                //         BorderRadius.all(Radius.circular(9)),
+                                //   ),
+                                // ),
+
                                 if (_selectedExcelFile != null)
                                   Image.asset(
                                     "assets/images/excel.png",
@@ -825,6 +826,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully a principal"),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -833,6 +835,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
           const SnackBar(
             content:
                 Text("Failed to register the principal. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -843,6 +846,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the principal"),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -891,6 +895,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully a teacher"),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -898,6 +903,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to register the learner. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -908,6 +914,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the learner"),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -983,6 +990,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully registered a learner"),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -990,6 +998,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to register the learner. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -1000,6 +1009,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the parent"),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -1048,6 +1058,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully a parent"),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -1055,6 +1066,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to register the parent. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -1065,6 +1077,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the parent"),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -1165,7 +1178,10 @@ class _RoleRegistrationState extends State<RoleRegistration> {
     } on DioException catch (e) {
       log("Error occurred: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load schools: $e')),
+        SnackBar(
+          content: Text('Failed to load schools: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
       setState(() {
         isLoading = false;
@@ -1190,6 +1206,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Please select an Excel file."),
+            backgroundColor: Colors.red,
           ),
         );
         return; // Exit early if no file is selected
@@ -1214,6 +1231,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully registered all the learners."),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -1221,6 +1239,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to register the learners. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -1229,6 +1248,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the learners."),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -1251,6 +1271,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Please select an Excel file."),
+            backgroundColor: Colors.red,
           ),
         );
         return; // Exit early if no file is selected
@@ -1274,6 +1295,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully registered all the parents."),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -1281,6 +1303,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to register the parents. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -1289,6 +1312,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the parents."),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -1311,6 +1335,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Please select an Excel file."),
+            backgroundColor: Colors.red,
           ),
         );
         return; // Exit early if no file is selected
@@ -1336,6 +1361,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("You have successfully registered all the Teachers."),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context); // Pop the screen only after success
@@ -1343,6 +1369,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to register the teahers. Please try again."),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -1351,6 +1378,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Could not register the teachers."),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -1392,6 +1420,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("No file selected"),
+          backgroundColor: Colors.red,
         ),
       );
     }

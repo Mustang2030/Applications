@@ -12,21 +12,23 @@ import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
 
-class AnnouncementsPage extends StatefulWidget {
-  const AnnouncementsPage({super.key});
+class ParentsAnnouncementsPage extends StatefulWidget {
+  const ParentsAnnouncementsPage({super.key});
 
   @override
-  State<AnnouncementsPage> createState() => _AnnouncementsPageState();
+  State<ParentsAnnouncementsPage> createState() =>
+      _ParentsAnnouncementsPagePageState();
 }
 
-class _AnnouncementsPageState extends State<AnnouncementsPage> {
+class _ParentsAnnouncementsPagePageState
+    extends State<ParentsAnnouncementsPage> {
   late HttpService http;
 
   @override
   void initState() {
     super.initState();
     http = HttpService();
-    getPrincipal("Principal/GetPrincipalById?id=");
+    getParent("Parent/GetParentById?id=");
   }
 
   bool isLoading = false;
@@ -50,7 +52,7 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
             color: kTextColor,
           ),
         ),
-        title: const Row(
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
@@ -58,9 +60,9 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
               color: kTextColor,
               size: 34,
             ),
-            SizedBox(width: 16),
+            SizedBox(width: 5),
             Text(
-              'Announcements',
+              'Total Announcements: ${announcements.length}',
               style: TextStyle(color: kTextColor),
             ),
           ],
@@ -114,28 +116,37 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
     );
   }
 
-  Future<void> getPrincipal(String url) async {
+  Future<void> getParent(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
-    log('Fetching principal');
+
     try {
       setState(() {
         isLoading = true;
       });
-
+      log("fetching data...");
       Response response = await http.getRequest("${http.baseUrl}$url$token");
 
-      if (response.statusCode == 200) {
-        var result = response.data['Result'];
+      log("The status code is ${response.statusCode} for getting parent and learner data");
+
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         if (response.data['Success'] == true) {
+          var result = response.data['Result'];
           setState(() {
-            principal = Principal.fromJson(result);
-            log("Mapped Principal: Name: ${principal.name}");
+            parent = Parent.fromJson(result);
+
+            log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
+            isLoading = false;
           });
-          await getAnnouncements(
-              "Announcement/GetAllAnnBySchool?schoolId=${principal.schoolID}");
         }
+
+        getAnnouncements("");
+      } else {
+        log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
+        setState(() {
+          isLoading = false;
+        });
       }
-    } catch (e) {
+    } on Exception catch (e) {
       log("Error occurred: $e");
     } finally {
       setState(() {
@@ -177,6 +188,26 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> deleteAnnouncement(int? id) async {
+    try {
+      Response response = await http.deleteRequest(
+          "${http.baseUrl}Announcement/Delete?announcementId=$id");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        log("Announcement made");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Announcement has been deleted"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await getAnnouncements(
+            "Announcement/GetAnnouncementsByTeacherId?id=${principal.id}");
+      }
+    } on DioException catch (e) {
+      log("Put me into your blody arms${e.response!.data}");
     }
   }
 }

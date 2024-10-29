@@ -221,41 +221,6 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
                   isLoading
                       ? () {}
                       : () {
-                          // setState(() {
-                          //   school.id = 0;
-                          //   school.emisNumber = emisNumber.text;
-                          //   school.logo = "School Logo";
-                          //   school.name = schoolName.text;
-                          //   school.dateregistered = DateTime.now();
-                          //   school.type = selectedSchoolType;
-                          //   school.systemAdminId = int.tryParse(token!);
-                          //   school.telephoneNumber =
-                          //       int.tryParse(telephone.text);
-                          //   school.emailAddress = emailController.text;
-
-                          //   // Populate address
-                          //   school.schoolAddress = Address(
-                          //     school: null,
-                          //     addressID: 0,
-                          //     street: streetController.text,
-                          //     suburb: suburbController.text,
-                          //     city: cityController.text,
-                          //     postalCode: postalCodeController.text,
-                          //     province: selectedProvince,
-                          //     schoolID: 0,
-                          //   );
-
-                          //   // Populate nested models like SysAdmin, Principal, etc.
-                          //   school.schoolSysAdminNP = systemAdmin;
-
-                          //   school.schoolPrincipalNP = null;
-
-                          //   // Initialize other nested lists
-                          //   school.schoolLearnersNP = null;
-                          //   school.schoolTeachersNP = null;
-                          //   school.schoolAnnouncementNP = null;
-                          //   school.schoolGroupsNP = null;
-                          // });
                           registerSchool();
                         },
                 ),
@@ -266,61 +231,6 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
       ),
     );
   }
-
-  // Future<void> registerSchool() async {
-  //   if (!validateFields()) return; // Ensure fields are valid
-
-  //   setState(() {
-  //     isLoading = true; // Enable loading state
-  //   });
-  //   try {
-  //     log("Registering school");
-  //     Response response = await http.postRequest(
-  //         "${http.baseUrl}School/RegisterSchool/", school.toJson());
-
-  //     String? token = Provider.of<LoginProvider>(context, listen: false).token;
-  //     log(' This is the token $token');
-
-  //     setState(() {
-  //       school = School(
-  //         systemAdminId: int.tryParse(
-  //           token.toString(),
-  //         ),
-  //       );
-  //     });
-
-  //     if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-  //       log("Registered");
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text("You have successfully registered your school"),
-  //         ),
-  //       );
-  //       Navigator.pop(context); // Pop the screen only after success
-  //     } else {
-  //       // Handle unsuccessful registration (e.g., validation errors)
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text("Failed to register the school. Please try again."),
-  //         ),
-  //       );
-  //     }
-  //   } on DioException catch (dioError) {
-  //     log("DioError occurred: $dioError");
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text("Could not register the school"),
-  //       ),
-  //     );
-  //   } catch (error) {
-  //     log("$error");
-  //     errorMessage = "$error";
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false; // Disable loading state
-  //     });
-  //   }
-  // }
 
   Future<void> getUser(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;

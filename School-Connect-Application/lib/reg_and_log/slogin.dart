@@ -1,8 +1,9 @@
 import 'dart:developer';
-//Come back and check this before the day ends
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
+import 'package:scs/misc/validators.dart';
 import 'package:scs/models/loginmodel/loginmodel.dart';
 import 'package:scs/services/http_service.dart';
 
@@ -47,6 +48,16 @@ class _SLoginState extends State<SLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(1, 34, 41, 1),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0F2E34),
+        leading: IconButton(
+          color: kTextColor,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -83,6 +94,7 @@ class _SLoginState extends State<SLogin> {
                       const SizedBox(height: 20),
                       StyledFormField(
                         controller: emailAddressController,
+                        validator: validateEmail,
                         textStyle: const TextStyle(color: Colors.white),
                         decoration: formS(
                             "Email", 'Write Email Here', Icons.email,
@@ -130,6 +142,13 @@ class _SLoginState extends State<SLogin> {
                             iconColor: Colors.white,
                             labelTextColor: Colors.white,
                             hintTextColor: Colors.white),
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          errorMessage,
+                          style: TextStyle(color: Colors.red, fontSize: 18),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
@@ -193,10 +212,10 @@ class _SLoginState extends State<SLogin> {
       );
       log("This is the statusCode that is being returned ${response.statusCode}");
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        Navigator.pop(context);
         log("Password change successful");
         var data = response.data;
         if (data['Success'] == true) {
-          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Password reset successful. Please log in."),
@@ -213,12 +232,11 @@ class _SLoginState extends State<SLogin> {
     } on DioException catch (dioError) {
       log("DioError occurred: ${dioError.response?.data}");
       setState(() {
-        errorMessage = dioError.response?.data['message'] ?? 'Network error';
+        errorMessage = handleDioError(dioError) ?? 'Network error';
       });
     } catch (error) {
-      log("$error");
       setState(() {
-        errorMessage = "An unexpected error occurred.";
+        errorMessage = "$error";
       });
     } finally {
       setState(() {

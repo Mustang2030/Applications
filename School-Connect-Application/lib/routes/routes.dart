@@ -2,61 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:scs/pages/child/attendance.dart';
 import 'package:scs/pages/child/markattendence.dart';
 import 'package:scs/pages/child/report.dart';
-import 'package:scs/pages/parent/parent.dart';
-import 'package:scs/pages/parent/parentlandingpage.dart';
-import 'package:scs/pages/parent/parentSchoolProfile.dart';
-import 'package:scs/pages/parent/parentViewAnn.dart';
+import 'package:scs/pages/parent/parent_landing_page.dart';
+// import 'package:scs/pages/parent/parentlandingpage.dart';
+import 'package:scs/pages/parent/parent_view_list_announcements.dart';
 import 'package:scs/pages/parent/parentViewAttendance.dart';
 import 'package:scs/pages/parent/parentViewChildProf.dart';
 import 'package:scs/pages/parent/parentViewProf.dart';
-import 'package:scs/pages/principal/principallanding.dart';
+import 'package:scs/pages/principal/principal_landing_page.dart';
 import 'package:scs/pages/communication/make_announcement.dart';
 import 'package:scs/pages/principal/principalViewAttendance.dart';
 import 'package:scs/pages/principal/principalViewGrades.dart';
-import 'package:scs/pages/principal/principalviewprofile.dart';
+import 'package:scs/pages/principal/principal_view_detail_announcement.dart';
+import 'package:scs/pages/principal/principal_view_profile.dart';
 import 'package:scs/pages/principal/principlaGradeLanding.dart';
 import 'package:scs/pages/communication/view_announcements.dart';
 import 'package:scs/pages/schools/schools_list.dart';
-import 'package:scs/pages/systemadmin/admindetails.dart';
 import 'package:scs/pages/systemadmin/rolesregistration.dart';
 import 'package:scs/pages/systemadmin/schoolregistration.dart';
 import 'package:scs/pages/systemadmin/sysadminViewProf.dart';
 import 'package:scs/pages/systemadmin/systemadminlanding.dart';
-import 'package:scs/pages/systemadmin/sysadminRegRoles.dart';
-import 'package:scs/pages/systemadmin/sysadminregschool.dart';
 import 'package:scs/pages/teachers/teacher.dart';
 import 'package:scs/pages/principal/attendence.dart';
-import 'package:scs/pages/principal/delannnounce.dart';
+import 'package:scs/pages/principal/principal_view_list_announcements.dart';
 import 'package:scs/pages/principal/grades.dart';
-import 'package:scs/pages/principal/pannounce.dart';
+import 'package:scs/pages/principal/principal_make_announcement.dart';
 import 'package:scs/pages/principal/reports.dart';
 import 'package:scs/pages/principal/teachprof.dart';
+import 'package:scs/pages/teachers/teacher_make_announcement.dart';
+import 'package:scs/pages/teachers/teacher_view_detail_announcement.dart';
+import 'package:scs/pages/teachers/teacher_view_list_announcements.dart';
 import 'package:scs/pages/teachers/teacherchatlist.dart';
 import 'package:scs/reg_and_log/slogin.dart';
 import 'package:scs/pages/teachers/childprot.dart';
 import 'package:scs/pages/teachers/classroaste.dart';
 import 'package:scs/pages/teachers/makereport.dart';
 import 'package:scs/pages/teachers/subj.dart';
-import 'package:scs/pages/teachers/teacherp.dart';
+import 'package:scs/pages/teachers/teacher_landing_page.dart';
 import 'package:scs/pages/communication/announce.dart';
 import 'package:scs/pages/communication/chat_screen.dart';
 import 'package:scs/pages/communication/contact_list.dart';
 import 'package:scs/pages/communication/pcontactlist.dart';
 import 'package:scs/pages/parent/announcement.dart';
-import 'package:scs/pages/parent/childpro.dart';
+import 'package:scs/pages/child/childpro.dart';
 import 'package:scs/pages/communication/detailed_announce.dart';
-import 'package:scs/pages/parent/pprofile.dart';
+import 'package:scs/pages/parent/parent_view_profile.dart';
 import 'package:scs/reg_and_log/login.dart';
 import 'package:scs/pages/teachers/subjectt.dart';
-import 'package:scs/pages/teachers/tprofile.dart';
+import 'package:scs/pages/teachers/teacher_view_profile.dart';
 
 class RouteManagerProvider {
   static const String login = '/',
       slogin = '/slogin',
       register = '/register',
       adminprofile = '/adminprofile',
-      principallandingpage = '/principallandingpage',
-      parent = '/parent',
       teacher = '/teacher',
       teacherp = '/teacherp',
       schoolregistration = '/schoolregistration',
@@ -83,8 +81,24 @@ class RouteManagerProvider {
       teachprofpv = '/teachprofpv',
       attendencepv = '/attendencepv',
       pvreport = '/pvreport',
-      pcannounce = '/pcannounce',
-      delannounceS = '/delannounceS',
+
+      // Princial
+      principallandingpage = '/principallandingpage',
+      principalMakeAnnounce = '/principal_make_announce',
+      principalDetailAnnounce = '/principal_detail_announce',
+      principalListAnnounce = "/principalListAnnounce",
+
+      // Parent
+      parent = '/parent',
+      parentViewListAnnouncemnt = '/parentViewListAnnouncemnt',
+      parenViewDetailAnnouncement = "/parenViewDetailAnnouncement",
+
+      // Teacher
+      teacherViewListAnnouncent = '/teacherViewListAnnouncent',
+      teacherMakeAnnouncement = "/teacherMakeAnnouncement",
+      teacherViewDetailAnnouncement = "/teacherDetailViewAnnouncement",
+
+      // Learner
       gradeView = '/gradeView',
       landingPage = 'landing_page_principal',
       makeAnnouncements = 'make_announcements_principal',
@@ -113,6 +127,7 @@ class RouteManagerProvider {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      // Login
       case login:
         return MaterialPageRoute(
           builder: (context) => const Login(),
@@ -121,21 +136,30 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const SLogin(),
         );
-      case systemadminlanding:
-        return MaterialPageRoute(
-          builder: (context) => const SysAdminLandingPage(),
-        );
+
+      // Principal
       case principallandingpage:
         return MaterialPageRoute(
           builder: (context) => const PrincipalLandingPage(),
         );
-      case parent:
+      case principalMakeAnnounce:
         return MaterialPageRoute(
-          builder: (context) => const ParentPage(),
+          builder: (context) => const PrincipalMakeAnnouncements(),
         );
-      case teacher:
+      case principalDetailAnnounce:
         return MaterialPageRoute(
-          builder: (context) => const Teacher(),
+          builder: (context) => const PrincipalDetailAnnounce(),
+        );
+      case viewProfile:
+        return MaterialPageRoute(builder: (context) => PrincipalProfileView());
+      case principalListAnnounce:
+        return MaterialPageRoute(
+            builder: (context) => PrincipalListAnnouncementsPage());
+
+      // System Admin
+      case systemadminlanding:
+        return MaterialPageRoute(
+          builder: (context) => const SysAdminLandingPage(),
         );
       case schoolregistration:
         return MaterialPageRoute(
@@ -145,6 +169,35 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const RoleRegistration(),
         );
+
+      // Parent
+      case parent:
+        return MaterialPageRoute(
+          builder: (context) => const ParentPage(),
+        );
+      case parentViewListAnnouncemnt:
+        return MaterialPageRoute(
+          builder: (context) => const ParentsAnnouncementsPage(),
+        );
+      case schoolsList:
+        return MaterialPageRoute(
+          builder: (context) => const SchoolsList(),
+        );
+      // Teacher
+      case teacherMakeAnnouncement:
+        return MaterialPageRoute(
+            builder: (context) => TeacherMakeSchoolAnnouncementPage());
+      case teacherViewDetailAnnouncement:
+        return MaterialPageRoute(
+            builder: (context) => TeacherViewDetailAnnounce());
+      case teacherViewListAnnouncent:
+        return MaterialPageRoute(
+            builder: (context) => TeacherViewListAnnouncementsPage());
+      case teacher:
+        return MaterialPageRoute(
+          builder: (context) => const Teacher(),
+        );
+
       case contactlist:
         return MaterialPageRoute(
           builder: (context) => const ContactList(),
@@ -185,10 +238,7 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const MarkAttendance(),
         );
-      case schoolsList:
-        return MaterialPageRoute(
-          builder: (context) => const SchoolsList(),
-        );
+
       case dannounce:
         return MaterialPageRoute(
           builder: (context) => const DetailAnnounce(),
@@ -237,28 +287,9 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const PVReport(),
         );
-      case pcannounce:
-        return MaterialPageRoute(
-          builder: (context) => const PAnnouncements(),
-        );
-      case delannounceS:
-        return MaterialPageRoute(
-          builder: (context) => const DelAnnouncementS(),
-        );
-      case adminprofile:
-        return MaterialPageRoute(
-          builder: (context) => const AdminDetails(),
-        );
       case gradeView:
         return MaterialPageRoute(builder: (context) => ViewGradeOverviewPage());
-      case landingPage:
-        return MaterialPageRoute(
-            builder: (context) => const PrincipalLandingPage());
-      case viewProfile:
-        return MaterialPageRoute(builder: (context) => ProfileView());
-      case makeAnnouncements:
-        return MaterialPageRoute(
-            builder: (context) => MakeSchoolAnnouncementPage());
+
       case viewAttendance:
         return MaterialPageRoute(builder: (context) => ViewAttendancePage());
       case viewAnnouncements:
@@ -271,18 +302,13 @@ class RouteManagerProvider {
         return MaterialPageRoute(
             builder: (context) => principalGradeLandingPage());
       //System Admin Routing
-      case sysadminregschool:
-        return MaterialPageRoute(
-            builder: (context) => SchoolRegistrationForm());
-      case sysadminRegRoles:
-        return MaterialPageRoute(builder: (context) => RolesRegistrationPage());
+
       case sysadminviewprofile:
         return MaterialPageRoute(builder: (context) => ProfileViewS());
       //Parent Routing
-      case parentlanding:
-        return MaterialPageRoute(builder: (context) => ParentLandingPage());
-      case parentSchoolPofile:
-        return MaterialPageRoute(builder: (context) => ParentSchoolProfile());
+      // case parentlanding:
+      //   return MaterialPageRoute(builder: (context) => ParentLandingPage());
+
       case parentViewann:
         return MaterialPageRoute(
             builder: (context) => ParentsAnnouncementsPage());

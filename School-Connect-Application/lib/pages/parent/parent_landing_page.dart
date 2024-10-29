@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +23,7 @@ class _ParentPageState extends State<ParentPage> {
   late HttpService http;
   bool isLoading = false;
   Parent parent = Parent();
-  Learner learner = Learner();
+  Learner learner = Learner(subjects: []);
   School school = School();
   List<LearnerParent> learners = [];
   List<LearnerParent> parents = [];
@@ -60,116 +58,109 @@ class _ParentPageState extends State<ParentPage> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Center(
-              child: SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.person_3,
-                        size: 90,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Hello ${parent.title} ${parent.name} ${parent.surname} ",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(110, 0, 110, 0),
-                        child: rslButton(context, "View Profile", () {
-                          Navigator.pushNamed(
-                              context, RouteManagerProvider.pprofile);
-                        }),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "LIST OF SCHOOLS:",
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
-                      ),
-                      // SizedBox(
-                      //   height: 400,
-                      //   child: ListView.builder(
-                      //     itemCount: parent.children!.length,
-                      //     itemBuilder: (context, index) {
-                      //       final child = parent.children![index];
-                      //       return MaterialButton(
-                      //         onPressed: () {},
-                      //         child: ListTile(
-                      //           leading: Text("${child.learnerIdNo}"),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
-                      isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : schools.isNotEmpty
-                              ? SizedBox(
-                                  height: 400,
-                                  child: ListView.builder(
-                                    itemCount: schools.length,
-                                    itemBuilder: (context, index) {
-                                      final school = schools[index];
-                                      return MaterialButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context,
-                                              RouteManagerProvider.schoolsList);
-                                        },
-                                        child: ListTile(
-                                          enableFeedback: true,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 10, horizontal: 15),
-                                          tileColor: const Color(0xFF0F2E34),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+          : Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Center(
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.person_3,
+                          size: 90,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "Hello ${parent.title} ${parent.name} ${parent.surname} ",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(110, 0, 110, 0),
+                          child: rslButton(context, "View Profile", () {
+                            Navigator.pushNamed(
+                                context, RouteManagerProvider.pprofile);
+                          }),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "LIST OF SCHOOLS:",
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w600),
+                        ),
+                        isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : schools.isNotEmpty
+                                ? SizedBox(
+                                    height: 400,
+                                    child: ListView.builder(
+                                      itemCount: schools.length,
+                                      itemBuilder: (context, index) {
+                                        final school = schools[index];
+                                        return MaterialButton(
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                                context,
+                                                RouteManagerProvider
+                                                    .schoolsList);
+                                          },
+                                          child: ListTile(
+                                            enableFeedback: true,
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 15),
+                                            tileColor: const Color(0xFF0F2E34),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            leading: Text(
+                                              "${school.type}",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: kTextColor),
+                                            ),
+                                            title: Text(
+                                              "${school.name}",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: kTextColor),
+                                            ),
+                                            subtitle: Text(
+                                              "Emis Number : ${school.emisNumber}",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: kTextColor),
+                                            ),
                                           ),
-                                          leading: Text(
-                                            "${school.type}",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: kTextColor),
-                                          ),
-                                          //When we have a proper image
-                                          // leading: school.logo != null
-                                          //     ? Image.network(school.logo!)
-                                          //     : const Icon(Icons.school),
-                                          title: Text(
-                                            "${school.name}",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w500,
-                                                color: kTextColor),
-                                          ),
-                                          subtitle: Text(
-                                            "Emis Number : ${school.emisNumber}",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: kTextColor),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : const Center(
+                                    child: Text("No schools found"),
                                   ),
-                                )
-                              : const Center(
-                                  child: Text("No schools found"),
-                                ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(110, 0, 110, 0),
-                        child: rslButton(context, "LOG OUT", () {
-                          logOut();
-                        }),
-                      ),
-                    ],
+                        const SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(110, 0, 110, 0),
+                          child: rslButton(context, "LOG OUT", () {
+                            logOut();
+                          }),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

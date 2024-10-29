@@ -91,19 +91,22 @@ class _SysAdminLandingPageState extends State<SysAdminLandingPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // Make the colors of the buttons to be changeable
                 school.id == null
                     ? slButton(context, "Register School", () {
                         Navigator.pushNamed(
                             context, RouteManagerProvider.schoolregistration);
                       })
-                    : slButton(context, "${school.name} registered", () {}),
-                //Choose between slButton and _buildButoon
+                    : slButton(context, "${school.name} Registered", () {}),
 
                 const SizedBox(height: 10),
-                slButton(context, "Register Roles", () {
-                  Navigator.pushNamed(
-                      context, RouteManagerProvider.roleregistration);
-                }),
+                school.id == null
+                    ? slButton(context, "Please Register School", () {})
+                    : slButton(context, "Register Roles", () {
+                        Navigator.pushNamed(
+                            context, RouteManagerProvider.roleregistration);
+                      }),
 
                 const SizedBox(height: 20),
                 _buildLogoutButton(context),
@@ -228,6 +231,11 @@ class _SysAdminLandingPageState extends State<SysAdminLandingPage> {
 
             log("School name: ${school.name}");
           });
+          if (school == null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content:
+                    Text("Could not find a school linked to this admin's ID")));
+          }
         } else {
           log("Unexpected response format or 'Success' is false");
           ScaffoldMessenger.of(context).showSnackBar(

@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
@@ -10,14 +12,14 @@ import 'package:scs/models/school/school.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/services/http_service.dart';
 
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+class PrincipalProfileView extends StatefulWidget {
+  const PrincipalProfileView({super.key});
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
+  State<PrincipalProfileView> createState() => _PrincipalProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _PrincipalProfileViewState extends State<PrincipalProfileView> {
   bool _isEditingCell = false;
   bool _isEditingEmail = false;
   bool _isEditingPassword = false;
@@ -35,8 +37,12 @@ class _ProfileViewState extends State<ProfileView> {
   Principal principal = Principal();
   School school = School();
 
-  final TextEditingController _cellController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  // For Images
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
   void _saveChanges() {
     setState(() {
@@ -112,11 +118,11 @@ class _ProfileViewState extends State<ProfileView> {
         child: Column(
           children: [
             // Image.asset(principal.profileImage!),
-            // CircleAvatar(
-            //   radius: 50,
-            //   backgroundColor: Colors.grey,
-            //   child: Icon(Icons.person, size: 70, color: Color(0xFF0F2E34)),
-            // ),
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.grey,
+              child: Icon(Icons.person, size: 70, color: Color(0xFF0F2E34)),
+            ),
             SizedBox(height: 16),
             Text(
               "${principal.name} ${principal.surname}",
@@ -161,7 +167,7 @@ class _ProfileViewState extends State<ProfileView> {
             _buildProfileRow(
                 "Emis No", "${principal.principalSchoolNP?.emisNumber}"),
             StyledFormField(
-              controller: _cellController,
+              controller: phoneController,
               decoration: formS(
                 "Phone Number",
                 "",
@@ -170,7 +176,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ),
             StyledFormField(
-              controller: _emailController,
+              controller: emailController,
               decoration: formS(
                 "Email",
                 "",
@@ -179,7 +185,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ),
             rslButton(context, "Update", () {
-              // updateUser();
+              updateUser();
             }),
           ],
         ),
@@ -218,8 +224,8 @@ class _ProfileViewState extends State<ProfileView> {
         if (response.data['Success'] == true) {
           setState(() {
             principal = Principal.fromJson(result);
-            _emailController.text = principal.emailAddress!;
-            _cellController.text = principal.phoneNumber.toString();
+            emailController.text = principal.emailAddress!;
+            phoneController.text = principal.phoneNumber.toString();
 
             // Set values to controllers after data is fetched
 
@@ -233,6 +239,87 @@ class _ProfileViewState extends State<ProfileView> {
     } finally {
       setState(() {
         isLoading = false;
+      });
+    }
+  }
+
+  // Update principal
+  Future<void> updateUser() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      FormData formData = FormData.fromMap({
+        'id': principal.id,
+        'title': principal.title,
+        'profileImage': principal.profileImage,
+        'name': principal.name,
+        'surname': principal.surname,
+        'gender': principal.gender,
+        'role': principal.role,
+        'staffNr': principal.staffNr,
+        'emailAddress': emailController.text,
+        'phoneNumber': phoneController.text,
+        'schoolID': principal.schoolID,
+        'principalSchoolNP': principal.principalSchoolNP,
+        'announcementsNP': principal.announcementsNP,
+        if (_selectedImage != null) ...{
+          'profileImageFile': await MultipartFile.fromFile(
+            _selectedImage!.path,
+            filename: _selectedImage?.path.split('/').last,
+          ),
+        },
+      });
+
+      log("Request payload: $formData");
+
+      // Send HTTP PUT request
+      Response response = await http.putRequest(
+          "${http.baseUrl}Principal/UpdatePrincipal", formData);
+      log("This is the status code: ${response.statusCode}");
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Profile updated successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else if (response.statusCode! >= 400 && response.statusCode! < 500) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to update profile"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        log("Failed to update user, statusCode: ${response.statusCode}, message: ${response.statusMessage}");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } on DioException catch (dioError) {
+      log("DioError occurred: $dioError");
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      log("An unexpected error occurred: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // Image picker function
+  Future<void> pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path); // Get the correct mobile path
       });
     }
   }

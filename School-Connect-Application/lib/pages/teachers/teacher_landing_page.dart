@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:scs/misc/constants.dart';
 import 'package:scs/models/learner/learner.dart';
 import 'package:scs/models/parent/parent.dart';
 import 'package:scs/models/principal/principal.dart';
@@ -25,7 +26,7 @@ class _TeacherPState extends State<TeacherP> {
   @override
   void initState() {
     http = HttpService();
-    getUser("Teacher/GetTeacherById?id=");
+    getTeacher("Teacher/GetTeacherById?id=");
     super.initState();
   }
 
@@ -35,6 +36,7 @@ class _TeacherPState extends State<TeacherP> {
   Principal principal = Principal();
   School school = School();
   bool isLoading = false;
+  List<String> subjects = [];
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +76,18 @@ class _TeacherPState extends State<TeacherP> {
                         children: [
                           // Icon
                           const Icon(Icons.person,
-                              size: 100, color: Color(0xFF0F2E34)),
+                              size: 100, color: Color.fromARGB(255, 2, 23, 27)),
                           const SizedBox(height: 20),
+                          Text(
+                            '${teacher.role}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
                           // Name
                           Text(
                             '${teacher.title} ${teacher.name} ${teacher.surname}',
@@ -90,19 +102,54 @@ class _TeacherPState extends State<TeacherP> {
                               RouteManagerProvider.tdetails),
                           const SizedBox(height: 15),
                           _buildButton(context, 'Make Announcements',
-                              RouteManagerProvider.makeAnnouncements),
+                              RouteManagerProvider.teacherMakeAnnouncement),
                           const SizedBox(height: 15),
                           _buildButton(context, 'View Announcements',
-                              RouteManagerProvider.viewAnnouncements),
+                              RouteManagerProvider.teacherViewListAnnouncent),
                           const SizedBox(height: 15),
                           // Buttons
-                          _buildButton(context, 'Grades',
+                          _buildButton(context, 'Class Roaster',
                               RouteManagerProvider.gradeView),
                           const SizedBox(height: 40),
+
+                          const Text(
+                            "Subjects",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              if (subjects != null) ...[
+                                for (var subject in subjects) ...[
+                                  sclButton(
+                                    context,
+                                    subject,
+                                    () {},
+                                  )
+                                ]
+                                // ListView.builder(
+                                //   itemCount: subjects!.length,
+                                //   itemBuilder: (context, index) {
+                                //     var subject = subjects?[index];
+                                //     return sclButton(
+                                //       context,
+                                //       "${subject}",
+                                //       () {},
+                                //     );
+                                //   },
+                                // )
+                              ]
+                            ],
+                          ),
+                          const SizedBox(height: 40),
+
                           // Logout Button
                           GestureDetector(
                             onTap: () {
-                              Navigator.pop(context);
+                              logOut();
                             },
                             child: Container(
                               padding: const EdgeInsets.all(12),
@@ -145,7 +192,7 @@ class _TeacherPState extends State<TeacherP> {
         padding: const EdgeInsets.all(16),
         width: MediaQuery.of(context).size.width * 0.8,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: const Color(0xFF0F2E34),
           borderRadius: BorderRadius.circular(50),
         ),
         child: Center(
@@ -161,7 +208,7 @@ class _TeacherPState extends State<TeacherP> {
     );
   }
 
-  Future<void> getUser(String url) async {
+  Future<void> getTeacher(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
 
     try {
@@ -173,10 +220,12 @@ class _TeacherPState extends State<TeacherP> {
 
       log("responseCode for get teacher: ${response.statusCode}");
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-        Map<String, dynamic> result = response.data;
+        var result = response.data['Result'];
 
         setState(() {
           teacher = Teacher.fromJson(result);
+          // for( var group in teacher.groupNP)
+          subjects = teacher.subjects!;
 
           log("Mapped teacher: Name: ${teacher.name}, Email: ${teacher.emailAddress}, ID: ${teacher.id}");
           isLoading = false;
@@ -200,7 +249,7 @@ class _TeacherPState extends State<TeacherP> {
   Future<void> logOut() async {
     try {
       Response response = await http.postRequest(
-          "${http.baseUrl}SignIn/SignOut", parent.toJson());
+          "${http.baseUrl}SignIn/SignOut", teacher.toJson());
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -84,13 +84,13 @@ Container sclButton(BuildContext context, String isLogin, VoidCallback onTap) {
     child: ElevatedButton(
       onPressed: onTap, // Use the onTap callback when button is pressed
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.pressed)) {
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed)) {
             return Colors.black; // Color when pressed
           }
-          return Colors.grey; // Default color
+          return const Color.fromARGB(255, 110, 109, 109); // Default color
         }),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -674,6 +674,103 @@ class Student extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AnnouncementTile extends StatelessWidget {
+  final String from;
+  final String message;
+  final bool pending;
+  final bool seen;
+  final IconButton? delIcon;
+  final IconButton? editIcon;
+
+  const AnnouncementTile({
+    super.key,
+    required this.from,
+    required this.message,
+    this.pending = false,
+    this.seen = false,
+    this.delIcon,
+    this.editIcon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 18,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(
+            seen ? Icons.check_circle : Icons.radio_button_unchecked,
+            color: seen ? Colors.green : Colors.grey,
+            size: 24,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  from,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  height: 20,
+                  child: Text(
+                    message,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButtonsRow(
+            pending: pending,
+            delIcon: delIcon,
+            editIcon: editIcon,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class IconButtonsRow extends StatelessWidget {
+  final bool pending;
+  final IconButton? delIcon;
+  final IconButton? editIcon;
+
+  const IconButtonsRow({
+    super.key,
+    required this.pending,
+    this.delIcon,
+    this.editIcon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        if (pending && editIcon != null) editIcon!,
+        if (pending && delIcon != null) delIcon!,
+      ],
     );
   }
 }

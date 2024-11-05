@@ -42,6 +42,8 @@ class _RoleRegistrationState extends State<RoleRegistration> {
   final TextEditingController titleControllerL = TextEditingController();
   final TextEditingController nameControlerL = TextEditingController();
   final TextEditingController surnameControllerL = TextEditingController();
+  final TextEditingController classCode = TextEditingController();
+
   String selectedGenderL = "Male";
   String selectedTitleL = "Mr";
   List<String> subjectListL = [];
@@ -57,26 +59,29 @@ class _RoleRegistrationState extends State<RoleRegistration> {
   LearnerParent learnerParent = LearnerParent();
   List<School> schools = [];
 
-  String selectedRole = "Principal"; // Default selection
+  String selectedRole = "Teacher"; // Default selection
   String selectedGender = "Male";
   String selectedParentType = "Mother";
   String selectedTitle = "Mr";
+  List<String> roles = ["Principal", "Teacher", "Parent", "Learner"];
   List<String> subjectList = [];
   List<String> classIdes = [];
-  String classCode = "";
   bool isLoading = false;
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
   File? _selectedLearnerImage;
   File? _selectedExcelFile;
   late HttpService http;
+  IconData icons = IconData(
+    0xe73f, // Code point for the icon
+    fontFamily: 'MaterialIcons',
+  );
 
   @override
   void initState() {
     super.initState();
     http = HttpService();
     getAdmin('SystemAdmin/GetSystemAdminById?id=');
-    getSchools("School/GetSchoolByAdminId?adminId=");
   }
 
   @override
@@ -121,13 +126,11 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                           StyledFormField(
                             isDropdown: true,
                             selectedItem: selectedRole,
-                            dropdownItems: const [
-                              "Teacher",
-                              "Parent",
-                              "Principal",
-                              "Learner",
-                              //Model will be assigned to the selected item.
-                            ],
+                            dropdownItems: school.schoolPrincipalNP == null
+                                ? roles
+                                : (roles
+                                  ..removeWhere(
+                                      (roles) => roles == "Principal")),
                             onChanged: (selectedItem) {
                               setState(() {
                                 selectedRole = selectedItem;
@@ -144,8 +147,15 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                           //Teacher
                           Column(
                             children: [
-                              // Other fields like name, surname, etc.
+                              // Other fields like name, surname, per role selected
                               if (selectedRole == "Teacher") ...[
+                                if (_selectedImage != null)
+                                  Image.file(
+                                    _selectedImage!,
+                                    height: 150,
+                                    width: 150,
+                                    fit: BoxFit.cover,
+                                  ),
                                 rslButton(context, "Profile Image", () {
                                   pickImage();
                                 }),
@@ -173,39 +183,21 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                       "Surname", "", Icons.abc_sharp,
                                       iconColor: const Color(0xFF0F2E34)),
                                 ),
-
                                 StyledFormField(
                                   isDropdown: true,
                                   selectedItem: selectedGender,
                                   dropdownItems: const ["Male", "Female"],
-                                  decoration: formS(
-                                      "Gender", "", Icons.account_circle_sharp,
+                                  decoration: formS("Gender", "", icons,
                                       iconColor: const Color(0xFF0F2E34)),
                                   onChanged: (selectedItem) {
                                     setState(() {
                                       selectedGender = selectedItem;
+                                      selectedItem == "Female"
+                                          ? icons = Icons.female
+                                          : icons = Icons.male;
                                     });
                                   },
                                 ),
-                                // MainClass Dropdown
-                                // StyledFormField(
-                                //   isDropdown: true,
-                                //   readonly: true,
-                                //   dropdownItems: const [
-                                //     "8A",
-                                //     "9A",
-                                //     "10A",
-                                //     "11A",
-                                //     "12A",
-                                //   ],
-                                //   onChanged: (mainCl) {
-                                //     setState(() {
-                                //       classCode = mainCl;
-                                //     });
-                                //   },
-                                //   decoration: formS(
-                                //       "MainClass", "Select Main Class", Icons.school),
-                                // ),
                                 StyledFormField(
                                   controller: staffNrController,
                                   decoration: formS(
@@ -224,36 +216,6 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                       "Phone Number", "", Icons.phone,
                                       iconColor: const Color(0xFF0F2E34)),
                                 ),
-
-                                // MultiSelectDialogField(
-                                //   buttonIcon: const Icon(Icons.subject),
-                                //   buttonText: const Text("Classes Taught"),
-                                //   searchable: true,
-                                //   isDismissible: true,
-                                //   selectedColor: Colors.black87,
-                                //   items: [
-                                //     MultiSelectItem("8A", "8A"),
-                                //     MultiSelectItem("9B", "9B"),
-                                //     MultiSelectItem("10A", "10A"),
-                                //     MultiSelectItem("10B", "10B"),
-                                //     MultiSelectItem("11A", "11A"),
-                                //     MultiSelectItem("11B", "11B"),
-                                //     MultiSelectItem("12A", "12A"),
-                                //   ],
-                                //   onConfirm: (values) {
-                                //     setState(() {
-                                //       classIdes = values;
-                                //     });
-                                //   },
-                                //   title: const Text("Select Classes Taught"),
-                                //   decoration: const BoxDecoration(
-                                //     color: Colors.black38,
-                                //     border: Border(),
-                                //     borderRadius: BorderRadius.all(Radius.circular(9)),
-                                //   ),
-                                // ),
-                                // const SizedBox(height: 20),
-                                // MultiSelectFormField for selecting subjects
                                 MultiSelectDialogField(
                                   buttonIcon: const Icon(Icons.book),
                                   buttonText: const Text("Subjects Taught"),
@@ -295,7 +257,6 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                 slButton(context, "Batch Register", () {
                                   pickExcelFile();
                                 }),
-
                                 rslButton(
                                     context,
                                     isLoading ? "Loading..." : "Load Teachers",
@@ -309,77 +270,77 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                             ],
                           ),
                           //Principal
-                          Column(
-                            children: [
-                              if (selectedRole == "Principal") ...[
-                                if (_selectedImage != null)
-                                  Image.file(
-                                    _selectedImage!,
-                                    height: 150,
-                                    width: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                rslButton(context, "Profile Image", () {
-                                  pickImage();
-                                }),
-                                StyledFormField(
-                                  isDropdown: true,
-                                  selectedItem: selectedTitle,
-                                  dropdownItems: const ["Mr", "Mrs", "Miss"],
-                                  decoration: formS(
-                                      "Title", "", Icons.account_circle_sharp,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                  onChanged: (selectedItem) {
-                                    setState(() {
-                                      selectedTitle = selectedItem;
-                                    });
-                                  },
+                          Column(children: [
+                            if (selectedRole == "Principal") ...[
+                              if (_selectedImage != null)
+                                Image.file(
+                                  _selectedImage!,
+                                  height: 150,
+                                  width: 150,
+                                  fit: BoxFit.cover,
                                 ),
-                                StyledFormField(
-                                  controller: nameControler,
-                                  decoration: formS("Name", "", Icons.abc_sharp,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                ),
-                                StyledFormField(
-                                  controller: surnameController,
-                                  decoration: formS(
-                                      "Surname", "", Icons.abc_sharp,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                ),
-                                StyledFormField(
-                                  isDropdown: true,
-                                  selectedItem: selectedGender,
-                                  dropdownItems: const ["Male", "Female"],
-                                  decoration: formS(
-                                      "Gender", "", Icons.account_circle_sharp,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                  onChanged: (selectedItem) {
-                                    setState(() {
-                                      selectedGender = selectedItem;
-                                    });
-                                  },
-                                ),
-                                StyledFormField(
-                                  controller: staffNrController,
-                                  decoration: formS(
-                                      "Staff Number", "", Icons.abc_sharp,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                ),
-                                StyledFormField(
-                                  controller: emailController,
-                                  decoration: formS(
-                                      "Email", "", Icons.email_sharp,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                ),
-                                StyledFormField(
-                                  controller: phoneNumberController,
-                                  decoration: formS(
-                                      "Phone Number", "", Icons.phone,
-                                      iconColor: const Color(0xFF0F2E34)),
-                                ),
-                              ]
+                              rslButton(context, "Profile Image", () {
+                                pickImage();
+                              }),
+                              StyledFormField(
+                                isDropdown: true,
+                                selectedItem: selectedTitle,
+                                dropdownItems: const ["Mr", "Mrs", "Miss"],
+                                decoration: formS(
+                                    "Title", "", Icons.account_circle_sharp,
+                                    iconColor: const Color(0xFF0F2E34)),
+                                onChanged: (selectedItem) {
+                                  setState(() {
+                                    selectedTitle = selectedItem;
+                                  });
+                                },
+                              ),
+                              StyledFormField(
+                                controller: nameControler,
+                                decoration: formS("Name", "", Icons.abc_sharp,
+                                    iconColor: const Color(0xFF0F2E34)),
+                              ),
+                              StyledFormField(
+                                controller: surnameController,
+                                decoration: formS(
+                                    "Surname", "", Icons.abc_sharp,
+                                    iconColor: const Color(0xFF0F2E34)),
+                              ),
+                              StyledFormField(
+                                isDropdown: true,
+                                selectedItem: selectedGender,
+                                dropdownItems: const ["Male", "Female"],
+                                decoration: formS("Gender", "", icons,
+                                    iconColor: const Color(0xFF0F2E34)),
+                                onChanged: (selectedItem) {
+                                  setState(() {
+                                    selectedGender = selectedItem;
+                                    selectedItem == "Female"
+                                        ? icons = Icons.female
+                                        : icons = Icons.male;
+                                  });
+                                },
+                              ),
+                              StyledFormField(
+                                controller: staffNrController,
+                                decoration: formS(
+                                    "Staff Number", "", Icons.abc_sharp,
+                                    iconColor: const Color(0xFF0F2E34)),
+                              ),
+                              StyledFormField(
+                                controller: emailController,
+                                decoration: formS(
+                                    "Email", "", Icons.email_sharp,
+                                    iconColor: const Color(0xFF0F2E34)),
+                              ),
+                              StyledFormField(
+                                controller: phoneNumberController,
+                                decoration: formS(
+                                    "Phone Number", "", Icons.phone,
+                                    iconColor: const Color(0xFF0F2E34)),
+                              ),
                             ],
-                          ),
+                          ]),
                           //Parent
                           Column(
                             children: [
@@ -415,12 +376,14 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                   isDropdown: true,
                                   selectedItem: selectedGender,
                                   dropdownItems: const ["Male", "Female"],
-                                  decoration: formS(
-                                      "Gender", "", Icons.account_circle_sharp,
+                                  decoration: formS("Gender", "", icons,
                                       iconColor: const Color(0xFF0F2E34)),
                                   onChanged: (selectedItem) {
                                     setState(() {
                                       selectedGender = selectedItem;
+                                      selectedItem == "Female"
+                                          ? icons = Icons.female
+                                          : icons = Icons.male;
                                     });
                                   },
                                 ),
@@ -536,125 +499,28 @@ class _RoleRegistrationState extends State<RoleRegistration> {
 
                                 StyledFormField(
                                   isDropdown: true,
-                                  selectedItem: selectedGenderL,
+                                  selectedItem: selectedGender,
                                   dropdownItems: const ["Male", "Female"],
-                                  decoration: formS(
-                                      "Gender", "", Icons.account_circle_sharp,
+                                  decoration: formS("Gender", "", icons,
                                       iconColor: const Color(0xFF0F2E34)),
                                   onChanged: (selectedItem) {
                                     setState(() {
-                                      selectedGenderL = selectedItem;
+                                      selectedGender = selectedItem;
+                                      selectedItem == "Female"
+                                          ? icons = Icons.female
+                                          : icons = Icons.male;
                                     });
                                   },
                                 ),
 
-                                // MainClass Dropdown
                                 StyledFormField(
-                                  isDropdown: true,
-                                  readonly: true,
-                                  dropdownItems: [
-                                    //Rememeber to check the logic on this one.
-                                    if (systemAdmin.sysAdminSchoolNP!.type ==
-                                        "Primary") ...[
-                                      "1A",
-                                      "2A",
-                                      "3A",
-                                      "4A",
-                                      "5A",
-                                      "6A",
-                                      "7A"
-                                    ] else if (systemAdmin
-                                            .sysAdminSchoolNP!.type ==
-                                        "High") ...[
-                                      "8A",
-                                      "9A",
-                                      "10A",
-                                      "11A",
-                                      "12A",
-                                    ] else if (systemAdmin
-                                            .sysAdminSchoolNP!.type ==
-                                        "Combined") ...[
-                                      "1A",
-                                      "2A",
-                                      "3A",
-                                      "4A",
-                                      "5A",
-                                      "6A",
-                                      "7A",
-                                      "8A",
-                                      "9A",
-                                      "10A",
-                                      "11A",
-                                      "12A"
-                                    ]
-                                  ],
-                                  onChanged: (mainCl) {
-                                    setState(() {
-                                      classCode = mainCl;
-                                    });
-                                  },
-                                  decoration: formS("Class Code",
-                                      "Select Main Class", Icons.school,
+                                  controller: classCode,
+                                  decoration: formS(
+                                      "Class Code",
+                                      "Enter Class code e.g 8A, 9A, 10B",
+                                      Icons.school,
                                       iconColor: const Color(0xFF0F2E34)),
                                 ),
-                                // MultiSelectDialogField(
-                                //   buttonIcon: const Icon(Icons.book),
-                                //   buttonText: const Text("Subjects Taught"),
-                                //   searchable: true,
-                                //   isDismissible: true,
-                                //   selectedColor: Colors.black87,
-                                //   items: [
-                                //     MultiSelectItem("English", "English"),
-                                //     MultiSelectItem(
-                                //         "Mathematics", "Mathematics"),
-                                //     MultiSelectItem(
-                                //         "Social Sciences", "Social Sciences"),
-                                //     MultiSelectItem("Economics", "Economics"),
-                                //     MultiSelectItem("Afrikaans", "Afrikaans"),
-                                //     MultiSelectItem(
-                                //         "Life Orientation", "Life Orientation"),
-                                //     MultiSelectItem(
-                                //         "Life Skills", "Life Skills"),
-                                //   ],
-                                //   onConfirm: (values) {
-                                //     setState(() {
-                                //       subjectList = values;
-                                //     });
-                                //   },
-                                //   title: const Text("Select Subjects"),
-                                //   decoration: const BoxDecoration(
-                                //     color: Colors.black38,
-                                //     borderRadius:
-                                //         BorderRadius.all(Radius.circular(9)),
-                                //   ),
-                                // ),
-
-                                if (_selectedExcelFile != null)
-                                  Image.asset(
-                                    "assets/images/excel.png",
-                                    height: 100,
-                                    width: 100,
-                                    fit: BoxFit.cover,
-                                  ),
-                                slButton(
-                                    context,
-                                    isLoading ? "Loading..." : "Load Learners",
-                                    isLoading
-                                        ? () {}
-                                        : () {
-                                            pickExcelFile();
-                                          }),
-
-                                rslButton(
-                                    context,
-                                    isLoading
-                                        ? "Loading..."
-                                        : "Submit Loaded Learners",
-                                    isLoading
-                                        ? () {}
-                                        : () {
-                                            batchRegisterLearners();
-                                          }),
                                 const SizedBox(height: 10),
                                 const Text(
                                   "Parent Registration",
@@ -710,12 +576,14 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                   isDropdown: true,
                                   selectedItem: selectedGender,
                                   dropdownItems: const ["Male", "Female"],
-                                  decoration: formS(
-                                      "Gender", "", Icons.account_circle_sharp,
+                                  decoration: formS("Gender", "", icons,
                                       iconColor: const Color(0xFF0F2E34)),
                                   onChanged: (selectedItem) {
                                     setState(() {
                                       selectedGender = selectedItem;
+                                      selectedItem == "Female"
+                                          ? icons = Icons.female
+                                          : icons = Icons.male;
                                     });
                                   },
                                 ),
@@ -754,10 +622,45 @@ class _RoleRegistrationState extends State<RoleRegistration> {
                                   onChanged: (selectedItem) {
                                     selectedParentType = selectedItem;
                                   },
-                                  decoration: formS("Parent Type", "",
-                                      Icons.roller_skating_outlined,
+                                  decoration: formS(
+                                      "Parent Type", "", Icons.person_4,
                                       iconColor: const Color(0xFF0F2E34)),
                                 ),
+                                Text(
+                                  "OR",
+                                  style: TextStyle(
+                                      color: const Color(0xFF0F2E34),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                if (_selectedExcelFile != null)
+                                  Image.asset(
+                                    "assets/images/excel.png",
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                slButton(
+                                    context,
+                                    isLoading
+                                        ? "Loading..."
+                                        : "Batch Load Learners and Parents",
+                                    isLoading
+                                        ? () {}
+                                        : () {
+                                            pickExcelFile();
+                                          }),
+
+                                rslButton(
+                                    context,
+                                    isLoading
+                                        ? "Loading..."
+                                        : "Submit Loaded File",
+                                    isLoading
+                                        ? () {}
+                                        : () {
+                                            batchRegisterLearners();
+                                          }),
                               ]
                             ],
                           ),
@@ -945,7 +848,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
             systemAdmin.sysAdminSchoolNP!.schoolAddress!.schoolID,
         'learner.subjects': subjectList,
         'learner.classID': 0,
-        'learner.classCode': classCode,
+        'learner.classCode': classCode.text,
         'learner.profileImageFile': await MultipartFile.fromFile(
           _selectedLearnerImage!.path,
           filename: _selectedLearnerImage!.path.split('/').last,
@@ -1111,6 +1014,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
             log("Mapped SystemAdmin: Name: ${systemAdmin.name}, Email: ${systemAdmin.emailAddress}, ID: ${systemAdmin.id}");
             isLoading = false;
           });
+          getSchools("School/GetSchoolByAdminId?adminId=");
         }
       } else {
         log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
@@ -1145,30 +1049,37 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         // Log the response to check its format
         log("Response data: ${response.data}");
 
-        // Check if the response data is a list
-        if (response.data['Success'] is List) {
-          log("A list is returned");
-          var result = response.data['Result'] as List;
-          // Map the result to the list of School objects
+        var result = response.data["Result"];
+
+        if (response.data["Success"] == true) {
           setState(() {
-            schools = result.map((json) => School.fromJson(json)).toList();
-            log("Schools fetched: ${schools.length}");
-            isLoading = false;
-          });
-        } else if (response.data['Success'] is Map) {
-          log("A Map is returned");
-          // Handle the case where it's a single school object
-          setState(() {
-            school = School.fromJson(response.data);
-            schools = [school]; // Add single school to the list
-            isLoading = false;
-          });
-        } else {
-          log("Unexpected response format: ${response.data}");
-          setState(() {
-            isLoading = false;
+            school = School.fromJson(result);
           });
         }
+        // Check if the response data is a list
+        // if (response.data['Success'] is List) {
+        //   log("A list is returned");
+        //   var result = response.data['Result'] as List;
+        //   // Map the result to the list of School objects
+        //   setState(() {
+        //     schools = result.map((json) => School.fromJson(json)).toList();
+        //     log("Schools fetched: ${schools.length}");
+        //     isLoading = false;
+        //   });
+        // } else if (response.data['Success'] is Map) {
+        //   log("A Map is returned");
+        //   // Handle the case where it's a single school object
+        //   setState(() {
+        //     school = School.fromJson(response.data);
+        //     schools = [school]; // Add single school to the list
+        //     isLoading = false;
+        //   });
+        // } else {
+        //   log("Unexpected response format: ${response.data}");
+        //   setState(() {
+        //     isLoading = false;
+        //   });
+        // }
       } else {
         log("Problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
         setState(() {
@@ -1360,7 +1271,7 @@ class _RoleRegistrationState extends State<RoleRegistration> {
         log("Teachers registered");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("You have successfully registered all the Teachers."),
+            content: Text("You have successfully registered all the teachers."),
             backgroundColor: Colors.green,
           ),
         );

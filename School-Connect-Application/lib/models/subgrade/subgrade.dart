@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:scs/models/attendence/attendence.dart';
 import 'package:scs/models/grade/grade.dart';
 import 'package:scs/models/learner/learner.dart';
 import 'package:scs/models/teacher/teacher.dart';
@@ -13,6 +14,9 @@ class SubGrade {
 
   @JsonKey(name: "classDesignate")
   String? classDesignate;
+
+  @JsonKey(name: "subjectsTaught")
+  List<String>? subjectsTaught;
 
   //Foreign Key
   @JsonKey(name: "mainTeacherId")
@@ -34,12 +38,20 @@ class SubGrade {
   @JsonKey(name: "grade")
   Grade? grade;
 
-  SubGrade({
-    this.id,
-    this.classDesignate,
-    this.mainTeacherId,
-    this.gradeId,
-  });
+  @JsonKey(name: "attendanceRecords")
+  List<Attendence>? attendanceRecords;
+
+  SubGrade(
+      {this.id,
+      this.classDesignate,
+      this.mainTeacherId,
+      this.gradeId,
+      this.grade,
+      this.learners,
+      this.mainTeacher,
+      this.subjectsTaught,
+      this.teachers,
+      this.attendanceRecords});
 
   factory SubGrade.fromJson(Map<String, dynamic> json) =>
       _$SubGradeFromJson(json);

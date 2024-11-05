@@ -24,7 +24,7 @@ class _ChildProfileState extends State<ChildProfile> {
   bool isLoading = false;
   Parent parent = Parent();
   Learner learner = Learner(parents: []);
-  LearnerParent learnerParent = LearnerParent();
+  List<LearnerParent> learnerParent = [];
   School school = School();
   List<String> subjects = [];
 
@@ -145,7 +145,7 @@ class _ChildProfileState extends State<ChildProfile> {
 
         setState(() {
           parent = Parent.fromJson(result);
-          learner = Learner.fromJson(result);
+          learnerParent = parent.children!;
 
           log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
           isLoading = false;
@@ -169,7 +169,8 @@ class _ChildProfileState extends State<ChildProfile> {
   Future<void> getLearner(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
     log("The learners name is ${learner.name}");
-    token = learner.id.toString();
+    token = learnerParent.first.learner!.id.toString();
+
     try {
       setState(() {
         isLoading = true;
@@ -181,9 +182,7 @@ class _ChildProfileState extends State<ChildProfile> {
         var result = response.data["Result"];
 
         setState(() {
-          parent = Parent.fromJson(result);
           learner = Learner.fromJson(result);
-          learnerParent = LearnerParent.fromJson(result);
 
           // Set values to controllers after data is fetched
           // nameController.text = parent.name ?? '';
@@ -191,7 +190,7 @@ class _ChildProfileState extends State<ChildProfile> {
           // emailController.text = parent.emailAddress ?? '';
           // phoneController.text = parent.phoneNumber?.toString() ??
           //     ''; // Handle null numbers
-          subjects = learner.subjects!;
+          // subjects = learner.subjects!;
           // Provide.of<LoginProvider>(context, listen: false).
           log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
           isLoading = false;

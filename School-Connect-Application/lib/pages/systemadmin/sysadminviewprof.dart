@@ -40,14 +40,6 @@ class _ProfileViewSState extends State<ProfileViewS> {
   final TextEditingController _cellController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  void _saveChanges() {
-    setState(() {});
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Changes saved successfully!')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,9 +203,7 @@ class _ProfileViewSState extends State<ProfileViewS> {
 
             _cellController.text = systemAdmin.phoneNumber.toString();
             _emailController.text = systemAdmin.emailAddress!;
-
-            // Set values to controllers after data is fetched
-
+            // Set values to controllers after data is fetche
             log("Mapped SystemAdmin: Name: ${systemAdmin.name}, Email: ${systemAdmin.emailAddress}, School Name: ${systemAdmin.sysAdminSchoolNP!.name}");
             isLoading = false;
           });

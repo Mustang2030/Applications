@@ -19,7 +19,7 @@ Teacher _$TeacherFromJson(Map<String, dynamic> json) => Teacher(
           ? null
           : SubGrade.fromJson(json['mainClass'] as Map<String, dynamic>),
       classes: (json['classes'] as List<dynamic>?)
-          ?.map((e) => SubGrade.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => TeacherGrade.fromJson(e as Map<String, dynamic>))
           .toList(),
       subjects: (json['subjects'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -36,7 +36,9 @@ Teacher _$TeacherFromJson(Map<String, dynamic> json) => Teacher(
       teacherSchoolNP: json['teacherSchoolNP'] == null
           ? null
           : School.fromJson(json['teacherSchoolNP'] as Map<String, dynamic>),
-    );
+    )..attendanceRecords = (json['attendanceRecords'] as List<dynamic>?)
+        ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
+        .toList();
 
 Map<String, dynamic> _$TeacherToJson(Teacher instance) => <String, dynamic>{
       'id': instance.id,
@@ -56,4 +58,5 @@ Map<String, dynamic> _$TeacherToJson(Teacher instance) => <String, dynamic>{
       'teacherSchoolNP': instance.teacherSchoolNP,
       'groupNP': instance.groupNP,
       'announcementNP': instance.announcementNP,
+      'attendanceRecords': instance.attendanceRecords,
     };

@@ -1,6 +1,8 @@
 //done
 import 'package:json_annotation/json_annotation.dart';
 import 'package:scs/models/learner/learner.dart';
+import 'package:scs/models/school/school.dart';
+import 'package:scs/models/subgrade/subgrade.dart';
 import 'package:scs/models/teacher/teacher.dart';
 
 part 'attendence.g.dart';
@@ -8,50 +10,54 @@ part 'attendence.g.dart';
 @JsonSerializable()
 class Attendence {
   @JsonKey(name: "attendenceId")
-  int attendenceId;
+  int? attendenceId;
 
-  @JsonKey(name: "mondayDate")
-  bool mondayDate;
+  @JsonKey(name: "date")
+  DateTime? date;
 
-  @JsonKey(name: "tuesdayDate")
-  bool tuesdayDate;
-
-  @JsonKey(name: "wednesdayDate")
-  bool wednesdayDate;
-
-  @JsonKey(name: "thursdayDate")
-  bool thursdayDate;
-
-  @JsonKey(name: "fridayDate")
-  bool fridayDate;
+  @JsonKey(name: "status")
+  bool? status = false;
 
   //Fk
   @JsonKey(name: "learnerId")
-  int learnerId;
+  int? learnerId;
 
   @JsonKey(name: "teacherId")
-  int teacherId;
+  int? teacherId;
+
+  @JsonKey(name: "classId")
+  int? classId;
+
+  @JsonKey(name: "schoolId")
+  int? schoolId;
 
   //NP
-  @JsonKey(name: "learnerNP")
-  Learner learnerNP;
-
   @JsonKey(name: "teacherNP")
-  Teacher teacherNP;
+  Teacher? teacherNP;
+
+  @JsonKey(name: "learnerNP")
+  Learner? learnerNP;
+
+  @JsonKey(name: "class")
+  SubGrade? clas;
+
+  @JsonKey(name: "school")
+  School? school;
 
   Attendence({
-    required this.attendenceId,
-    required this.mondayDate,
-    required this.tuesdayDate,
-    required this.wednesdayDate,
-    required this.thursdayDate,
-    required this.fridayDate,
-    required this.learnerId,
-    required this.teacherId,
-    required this.learnerNP,
-    required this.teacherNP,
+    this.attendenceId,
+    this.date,
+    this.status,
+    this.learnerId,
+    this.teacherId,
+    this.classId,
+    this.schoolId,
+    this.learnerNP,
+    this.teacherNP,
+    this.clas,
+    this.school,
   });
-  factory Attendence.fromMap(Map<String, dynamic> json) =>
+  factory Attendence.fromJson(Map<String, dynamic> json) =>
       _$AttendenceFromJson(json);
 
   Map<String, dynamic> toJson() => _$AttendenceToJson(this);

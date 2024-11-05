@@ -182,7 +182,7 @@ class _SysAdminLandingPageState extends State<SysAdminLandingPage> {
             log("Mapped SystemAdmin: Name: ${systemAdmin.name}, Email: ${systemAdmin.emailAddress}, ID: ${systemAdmin.id}");
             isLoading = false;
           });
-          getSchools("School/GetSchoolByAdminId?adminId=");
+          await getSchools("School/GetSchoolByAdminId?adminId=");
         }
       } else {
         log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
@@ -231,8 +231,9 @@ class _SysAdminLandingPageState extends State<SysAdminLandingPage> {
 
             log("School name: ${school.name}");
           });
-          if (school == null) {
+          if (school.id == null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.red,
                 content:
                     Text("Could not find a school linked to this admin's ID")));
           }
@@ -253,12 +254,19 @@ class _SysAdminLandingPageState extends State<SysAdminLandingPage> {
     } on DioException catch (e) {
       log("Error occurred: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load schools: $e')),
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Failed to load schools: $e')),
       );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(e
+                .toString()
+                .replaceAll("Exception: ", "")
+                .replaceAll("Inner", ""))),
+      );
     }
   }
 }

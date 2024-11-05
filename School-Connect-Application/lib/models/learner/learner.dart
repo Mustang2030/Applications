@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:scs/models/attendence/attendence.dart';
 import 'package:scs/models/baseactor/baseactor.dart';
 import 'package:scs/models/learnerparent/learnerparent.dart';
 import 'package:scs/models/school/school.dart';
@@ -36,6 +37,7 @@ class Learner extends BaseActor {
     this.learnerSchoolNP,
     this.clas,
     this.parents,
+    this.attendenceRecords,
   });
 
   //Foreign Key
@@ -51,6 +53,9 @@ class Learner extends BaseActor {
 
   @JsonKey(name: "class")
   final SubGrade? clas;
+
+  @JsonKey(name: "attendenceRecords")
+  final List<Attendence>? attendenceRecords;
 
   factory Learner.fromJson(Map<String, dynamic> json) =>
       _$LearnerFromJson(json);

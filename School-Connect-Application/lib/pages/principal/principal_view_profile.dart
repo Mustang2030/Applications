@@ -20,10 +20,6 @@ class PrincipalProfileView extends StatefulWidget {
 }
 
 class _PrincipalProfileViewState extends State<PrincipalProfileView> {
-  bool _isEditingCell = false;
-  bool _isEditingEmail = false;
-  bool _isEditingPassword = false;
-
   late HttpService http;
 
   @override
@@ -43,18 +39,6 @@ class _PrincipalProfileViewState extends State<PrincipalProfileView> {
 
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-
-  void _saveChanges() {
-    setState(() {
-      _isEditingCell = false;
-      _isEditingEmail = false;
-      _isEditingPassword = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Changes saved successfully!')),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,18 +74,6 @@ class _PrincipalProfileViewState extends State<PrincipalProfileView> {
                     const SizedBox(height: 24),
                     _buildCombinedProfileCard(),
                     const SizedBox(height: 24),
-                    if (_isEditingCell || _isEditingEmail || _isEditingPassword)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: ElevatedButton(
-                          onPressed: _saveChanges,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0F2E34),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text("Save Changes"),
-                        ),
-                      ),
                   ],
                 ),
               ),

@@ -1,9 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:scs/models/announcement/announcement.dart';
+import 'package:scs/models/attendence/attendence.dart';
 import 'package:scs/models/baseactor/baseactor.dart';
 import 'package:scs/models/groupactor/groupactors.dart';
 import 'package:scs/models/school/school.dart';
 import 'package:scs/models/subgrade/subgrade.dart';
+import 'package:scs/models/teachergrade/teachergrade.dart';
 
 part 'teacher.g.dart';
 
@@ -30,7 +32,7 @@ class Teacher extends BaseActor {
   SubGrade? mainClass;
 
   @JsonKey(name: "classes")
-  List<SubGrade>? classes;
+  List<TeacherGrade>? classes;
 
   @JsonKey(name: "teacherSchoolNP")
   School? teacherSchoolNP;
@@ -40,6 +42,9 @@ class Teacher extends BaseActor {
 
   @JsonKey(name: "announcementNP")
   List<Announcement>? announcementNP;
+
+  @JsonKey(name: "attendanceRecords")
+  List<Attendence>? attendanceRecords; //One to one
 
   Teacher({
     super.id,

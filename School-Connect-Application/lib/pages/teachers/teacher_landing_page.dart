@@ -98,18 +98,29 @@ class _TeacherPState extends State<TeacherP> {
                             ),
                           ),
                           const SizedBox(height: 30),
-                          _buildButton(context, 'View Profile',
-                              RouteManagerProvider.tdetails),
-                          const SizedBox(height: 15),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 120, right: 120),
+                            child: _buildButton(context, 'View Profile',
+                                RouteManagerProvider.tdetails),
+                          ),
+                          const SizedBox(height: 40),
                           _buildButton(context, 'Make Announcements',
                               RouteManagerProvider.teacherMakeAnnouncement),
                           const SizedBox(height: 15),
-                          _buildButton(context, 'View Announcements',
-                              RouteManagerProvider.teacherViewListAnnouncent),
+                          _buildButton(
+                            context,
+                            'View Announcements',
+                            RouteManagerProvider.teacherViewListAnnouncent,
+                          ),
                           const SizedBox(height: 15),
                           // Buttons
-                          _buildButton(context, 'Class Roaster',
-                              RouteManagerProvider.gradeView),
+                          if (teacher.mainClass != null) ...[
+                            _buildButton(context, 'Class Roaster',
+                                RouteManagerProvider.teacherClassRoaster),
+                          ] else if (teacher.mainClass == null) ...[
+                            rslButton(context, "Not A Class Teacher", () {})
+                          ],
                           const SizedBox(height: 40),
 
                           const Text(
@@ -122,25 +133,16 @@ class _TeacherPState extends State<TeacherP> {
                           ),
                           Column(
                             children: [
-                              if (subjects != null) ...[
+                              ...[
                                 for (var subject in subjects) ...[
                                   sclButton(
                                     context,
                                     subject,
-                                    () {},
+                                    () {
+                                      // Navigator.pushNamed(context, RouteManagerProvider.);
+                                    },
                                   )
                                 ]
-                                // ListView.builder(
-                                //   itemCount: subjects!.length,
-                                //   itemBuilder: (context, index) {
-                                //     var subject = subjects?[index];
-                                //     return sclButton(
-                                //       context,
-                                //       "${subject}",
-                                //       () {},
-                                //     );
-                                //   },
-                                // )
                               ]
                             ],
                           ),
@@ -183,10 +185,10 @@ class _TeacherPState extends State<TeacherP> {
     );
   }
 
-  Widget _buildButton(BuildContext context, String text, String routeName) {
+  Widget _buildButton(BuildContext context, String text, String? routeName) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, routeName);
+        Navigator.pushNamed(context, routeName!);
       },
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -224,6 +226,9 @@ class _TeacherPState extends State<TeacherP> {
 
         setState(() {
           teacher = Teacher.fromJson(result);
+          // String? tcI = teacher.id.toString();
+          // Provider.of<LoginProvider>(context, listen: false).teacheI(tcI);
+
           // for( var group in teacher.groupNP)
           subjects = teacher.subjects!;
 
@@ -253,6 +258,7 @@ class _TeacherPState extends State<TeacherP> {
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            backgroundColor: Colors.green,
             content: Text("Logged out"),
           ),
         );

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
 import 'package:scs/models/learner/learner.dart';
 import 'package:scs/models/learnerparent/learnerparent.dart';
@@ -22,15 +23,18 @@ class _ChildProfileTState extends State<ChildProfileT> {
   late HttpService http;
   bool isLoading = false;
   Parent parent = Parent();
-  Learner learner = Learner(parents: []);
+  // List<Parent> parents = [];
+  Learner learner = Learner();
   LearnerParent learnerParent = LearnerParent();
+  List<LearnerParent> parents = [];
+
   School school = School();
   List<School> schools = [School()];
 
   @override
   void initState() {
     http = HttpService();
-    getParent("Parent/GetParentById?id=");
+    getLearner("Learner/GetLearnerByIdNo?idNo=");
     super.initState();
   }
 
@@ -42,141 +46,158 @@ class _ChildProfileTState extends State<ChildProfileT> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: const Icon(Icons.arrow_back)),
+            icon: const Icon(
+              Icons.arrow_back,
+              size: 25,
+              color: kTextColor,
+            )),
+        centerTitle: true,
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: kTextColor, fontSize: kTitleFontSize),
+        ),
+        backgroundColor: const Color(0xFF0F2E34),
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildProfileHeader(),
+                      const SizedBox(height: 24),
+                      _buildCombinedProfileCard(),
+                      const SizedBox(height: 24),
+                    ]),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const Icon(
-              Icons.person,
-              size: 100,
+            // Image.asset(principal.profileImage!),
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.grey,
+              child: Icon(Icons.person, size: 70, color: Color(0xFF0F2E34)),
             ),
+            SizedBox(height: 16),
             Text(
-              "${learner.title} ${learner.name} ${learner.surname}",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              "${learner.name} ${learner.surname}",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F2E34),
+              ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              "GRADE ${learner.classCode}",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              "CLASS TEACHER: Kgopolo Mooi",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              "Identity Number: ${learner.idNo}",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              "PARENT: ${learnerParent.parent?.name} ${learnerParent.parent?.name}",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              "PARENT PHONE NO.: ${parent.phoneNumber}",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              "PARENT EMAIL: ${parent.emailAddress}",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              "ADDRESS: 02 Potilolo str\n"
-              "                   Rusty\n"
-              "                   2424\n"
-              "                   North West",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(170, 0, 170, 0),
-              child: rslButton(context, "BACK", () {
-                Navigator.pop(context);
-              }),
-            ),
+            SizedBox(height: 8),
+            Text("${learner.role}", style: TextStyle(fontSize: 18)),
           ],
         ),
       ),
     );
   }
 
-  Future<void> getParent(String url) async {
-    String? token = Provider.of<LoginProvider>(context, listen: false).token;
+  Widget _buildCombinedProfileCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Profile Details section
+            const Text(
+              "Profile Details",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F2E34),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildProfileRow("Title", "${learner.title}"),
+            _buildProfileRow("Name", "${learner.name}"),
+            _buildProfileRow("Surname", "${learner.surname}"),
+            _buildProfileRow("Gender", "${learner.gender}"),
+            _buildProfileRow("ID Number", "${learner.idNo}"),
+            _buildProfileRow("Class Code", "${learner.classCode}"),
+            const SizedBox(height: 15),
+            // Prent info
+            for (var rent in parents) ...[
+              Text(
+                "${rent.parent!.parentType}",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0F2E34),
+                ),
+              ),
+              _buildProfileRow("Parent Name(s)",
+                  "${rent.parent!.name} ${rent.parent!.surname}"),
+              _buildProfileRow("Parent Type", "${rent.parent!.name}"),
+              _buildProfileRow(
+                  "ParentPhone Number", "${rent.parent!.phoneNumber}"),
+              _buildProfileRow(
+                  "Parent Parent Email", "${rent.parent!.emailAddress}"),
+              const SizedBox(height: 10),
+            ]
 
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      log("fetching data...");
-      Response response = await http.getRequest("${http.baseUrl}$url$token");
+            // _buildProfileRow(
+            //     "Class Teacher", "${learner.clas!.mainTeacher!.name}"),
+          ],
+        ),
+      ),
+    );
+  }
 
-      if (response.statusCode == 200) {
-        var result = response.data;
-
-        setState(() {
-          parent = Parent.fromJson(result);
-          learner = Learner.fromJson(result);
-          learnerParent = LearnerParent.fromJson(result);
-          // Set values to controllers after data is fetched
-          // nameController.text = parent.name ?? '';
-          // surnameController.text = parent.surname ?? '';
-          // emailController.text = parent.emailAddress ?? '';
-          // phoneController.text = parent.phoneNumber?.toString() ??
-          //     ''; // Handle null numbers
-
-          log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
-          isLoading = false;
-        });
-        getLearner("Learner/GetLearnerById?id=");
-      } else {
-        log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } on Exception catch (e) {
-      log("Error occurred: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+  Widget _buildProfileRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Color(0xFF0F2E34))),
+          Text(value, style: const TextStyle(color: Colors.black)),
+        ],
+      ),
+    );
   }
 
   Future<void> getLearner(String url) async {
-    String? token = Provider.of<LoginProvider>(context, listen: false).token;
+    String? learId = Provider.of<LoginProvider>(context, listen: false).lerId;
 
-    var parentIdNo = parent.id;
-    token = parentIdNo.toString();
     try {
       setState(() {
         isLoading = true;
       });
       log("fetching data...");
-      Response response = await http.getRequest("${http.baseUrl}$url$token");
+      Response response = await http.getRequest("${http.baseUrl}$url$learId");
 
-      if (response.statusCode == 200) {
-        var result = response.data;
+      if (response.data["Success"] == true) {
+        var result = response.data["Result"];
 
         setState(() {
-          parent = Parent.fromJson(result);
           learner = Learner.fromJson(result);
-          learnerParent = LearnerParent.fromJson(result);
-          // Set values to controllers after data is fetched
-          // nameController.text = parent.name ?? '';
-          // surnameController.text = parent.surname ?? '';
-          // emailController.text = parent.emailAddress ?? '';
-          // phoneController.text = parent.phoneNumber?.toString() ??
-          //     ''; // Handle null numbers
-          if (learner.schoolID != null) {
-            getSchools("School/GetSchoolById?schoolId=");
-          }
+          parents = learner.parents!;
+
+          // parents = List<LearnerParent>.from(
+          //     result.map((json) => LearnerParent(parent: json)));
+          // learnerParent = result.map((json) => LearnerParent.fromJson(json));
 
           log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
           isLoading = false;

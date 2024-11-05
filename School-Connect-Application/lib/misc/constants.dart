@@ -6,7 +6,8 @@ import 'package:scs/models/school/address.dart';
 import 'package:scs/routes/routes.dart';
 
 //rsl button in black and white
-Container rslButton(BuildContext context, String isLogin, Function onTap) {
+Container rslButton(BuildContext context, String isLogin, Function onTap,
+    {Color? color}) {
   return Container(
     width: MediaQuery.of(context).size.width,
     height: 50,
@@ -17,13 +18,12 @@ Container rslButton(BuildContext context, String isLogin, Function onTap) {
         onTap();
       },
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith(
+        backgroundColor: WidgetStateProperty.resolveWith<Color?>(
           (states) {
             if (states.contains(WidgetState.pressed)) {
               return Colors.black38;
             }
-
-            return Color(0xFF0F2E34);
+            return color ?? const Color(0xFF0F2E34);
           },
         ),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
@@ -332,20 +332,20 @@ class IconSelector extends StatefulWidget {
 }
 
 class _IconSelectorState extends State<IconSelector> {
-  IconData? selectedIcon; // Holds the selected icon, initially null
+  IconData? selectedIcon;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Display the selected icon, if any
+        // Display the selected icon
         if (selectedIcon != null)
           Icon(
             selectedIcon!,
             color: selectedIcon == Icons.close ? Colors.red : Colors.green,
           ),
-        // Button to trigger the pop-up dialog
+        // ElevatedButton to trigger the pop-up dialog
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
@@ -354,21 +354,24 @@ class _IconSelectorState extends State<IconSelector> {
           onPressed: () {
             _showIconSelectionDialog(context);
           },
-          child: const Text('Mark'),
+          child: const Text(
+            'Mark',
+            style: TextStyle(color: Color(0xFF0F2E34)),
+          ),
         ),
         // Optionally, add a reset button to allow changing the selection
-        if (selectedIcon != null)
-          TextButton(
-            onPressed: () {
-              setState(() {
-                selectedIcon = null; // Reset selection
-              });
-            },
-            child: const Text(
-              'Remove',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
+        // if (selectedIcon != null)
+        //   TextButton(
+        //     onPressed: () {
+        //       setState(() {
+        //         selectedIcon = null; // Reset selection
+        //       });
+        //     },
+        //     child: const Text(
+        //       'Remove',
+        //       style: TextStyle(color: Colors.black),
+        //     ),
+        //   ),
       ],
     );
   }

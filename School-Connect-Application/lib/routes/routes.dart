@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scs/pages/child/attendance.dart';
-import 'package:scs/pages/child/markattendence.dart';
+import 'package:scs/pages/child/teacher_mark_attendence.dart';
 import 'package:scs/pages/child/report.dart';
 import 'package:scs/pages/parent/parent_landing_page.dart';
 // import 'package:scs/pages/parent/parentlandingpage.dart';
@@ -16,12 +16,19 @@ import 'package:scs/pages/principal/principal_view_detail_announcement.dart';
 import 'package:scs/pages/principal/principal_view_profile.dart';
 import 'package:scs/pages/principal/principlaGradeLanding.dart';
 import 'package:scs/pages/communication/view_announcements.dart';
+import 'package:scs/pages/principal/school_management/add_subjects.dart';
+import 'package:scs/pages/principal/school_management/grade_overview.dart';
+import 'package:scs/pages/principal/school_management/manage_school_grades.dart';
+import 'package:scs/pages/principal/school_management/manage_teacher_class_assignement.dart';
+import 'package:scs/pages/principal/school_management/school_management.dart';
+import 'package:scs/pages/principal/school_management/teach_class_prof.dart';
+import 'package:scs/pages/principal/school_management/update_school_info.dart';
 import 'package:scs/pages/schools/schools_list.dart';
 import 'package:scs/pages/systemadmin/rolesregistration.dart';
 import 'package:scs/pages/systemadmin/schoolregistration.dart';
 import 'package:scs/pages/systemadmin/sysadminViewProf.dart';
 import 'package:scs/pages/systemadmin/systemadminlanding.dart';
-import 'package:scs/pages/teachers/teacher.dart';
+import 'package:scs/pages/teachers/teacher_class_roaster.dart';
 import 'package:scs/pages/principal/attendence.dart';
 import 'package:scs/pages/principal/principal_view_list_announcements.dart';
 import 'package:scs/pages/principal/grades.dart';
@@ -55,7 +62,6 @@ class RouteManagerProvider {
       slogin = '/slogin',
       register = '/register',
       adminprofile = '/adminprofile',
-      teacher = '/teacher',
       teacherp = '/teacherp',
       schoolregistration = '/schoolregistration',
       roleregistration = '/roleregistration',
@@ -87,6 +93,16 @@ class RouteManagerProvider {
       principalMakeAnnounce = '/principal_make_announce',
       principalDetailAnnounce = '/principal_detail_announce',
       principalListAnnounce = "/principalListAnnounce",
+      principalManageSchool = "/principalManageSchool",
+      principalUpdateSchool = "/principalUpdateSchool",
+
+      // Principle Manage School
+      principalAssignTeacherToClass = "/principleAssignTeacherToClass",
+      principleAnnouncementGroup = '/principleAnnouncementGroup',
+      manageGrades = "/manageGrades",
+      addSubjects = "/addSubjects",
+      gradeOverview = "/gradeOverview",
+      teachClassProf = "/teachClassProf",
 
       // Parent
       parent = '/parent',
@@ -97,6 +113,7 @@ class RouteManagerProvider {
       teacherViewListAnnouncent = '/teacherViewListAnnouncent',
       teacherMakeAnnouncement = "/teacherMakeAnnouncement",
       teacherViewDetailAnnouncement = "/teacherDetailViewAnnouncement",
+      teacherClassRoaster = '/teacherClassRoaster',
 
       // Learner
       gradeView = '/gradeView',
@@ -155,6 +172,23 @@ class RouteManagerProvider {
       case principalListAnnounce:
         return MaterialPageRoute(
             builder: (context) => PrincipalListAnnouncementsPage());
+      case principalUpdateSchool:
+        return MaterialPageRoute(builder: (context) => UpdateSchoolInfo());
+      case principalManageSchool:
+        return MaterialPageRoute(builder: (context) => SchoolManagement());
+      case manageGrades:
+        return MaterialPageRoute(builder: (context) => ManageSchoolGrades());
+      case addSubjects:
+        return MaterialPageRoute(builder: (context) => AddSubjects());
+      case gradeOverview:
+        return MaterialPageRoute(builder: (context) => GradeOverview());
+      case teachClassProf:
+        return MaterialPageRoute(builder: (context) => TeachClassProf());
+
+      // Principle Manage School
+      case principalAssignTeacherToClass:
+        return MaterialPageRoute(
+            builder: (context) => ManageTeacherClassAssignemnt());
 
       // System Admin
       case systemadminlanding:
@@ -193,9 +227,9 @@ class RouteManagerProvider {
       case teacherViewListAnnouncent:
         return MaterialPageRoute(
             builder: (context) => TeacherViewListAnnouncementsPage());
-      case teacher:
+      case teacherClassRoaster:
         return MaterialPageRoute(
-          builder: (context) => const Teacher(),
+          builder: (context) => const TeacherClassRoaster(),
         );
 
       case contactlist:
@@ -239,6 +273,12 @@ class RouteManagerProvider {
           builder: (context) => const MarkAttendance(),
         );
 
+      //In the waterS
+      case childprot:
+        return MaterialPageRoute(
+          builder: (context) => const ChildProfileT(),
+        );
+
       case dannounce:
         return MaterialPageRoute(
           builder: (context) => const DetailAnnounce(),
@@ -254,10 +294,6 @@ class RouteManagerProvider {
       case classroaster:
         return MaterialPageRoute(
           builder: (context) => const ClassRoaster(),
-        );
-      case childprot:
-        return MaterialPageRoute(
-          builder: (context) => const ChildProfileT(),
         );
       case makereport:
         return MaterialPageRoute(

@@ -9,8 +9,8 @@ class HttpService {
   HttpService({this.baseUrl = "http://10.0.2.2:5293/api/"})
       : dio = Dio(BaseOptions(
             baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 15),
+            connectTimeout: const Duration(seconds: 60),
+            receiveTimeout: const Duration(seconds: 60),
             headers: {'Content-Type': 'application/json'})) {
     _initializeInterceptors();
   }
@@ -30,7 +30,7 @@ class HttpService {
 
   Future<Response> putRequest(String endpoint, dynamic data) async {
     try {
-      log("Updatung data on $endpoint...");
+      log("Updating data on $endpoint...");
 
       // Log the type of data being posted
       log("Data type: ${data.runtimeType}");

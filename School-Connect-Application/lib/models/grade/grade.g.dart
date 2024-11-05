@@ -8,20 +8,20 @@ part of 'grade.dart';
 
 Grade _$GradeFromJson(Map<String, dynamic> json) => Grade(
       id: (json['id'] as num?)?.toInt(),
-      classDesignate: json['classDesignate'] as String?,
+      gradeDesignate: json['gradeDesignate'] as String?,
       schoolId: (json['schoolId'] as num?)?.toInt(),
       gradeScholNP: json['gradeScholNP'] == null
           ? null
           : School.fromJson(json['gradeScholNP'] as Map<String, dynamic>),
-      classes: (json['class'] as List<dynamic>?)
+      classes: (json['classes'] as List<dynamic>?)
           ?.map((e) => SubGrade.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$GradeToJson(Grade instance) => <String, dynamic>{
       'id': instance.id,
-      'classDesignate': instance.classDesignate,
+      'gradeDesignate': instance.gradeDesignate,
       'schoolId': instance.schoolId,
       'gradeScholNP': instance.gradeScholNP,
-      'class': instance.classes,
+      'classes': instance.classes,
     };

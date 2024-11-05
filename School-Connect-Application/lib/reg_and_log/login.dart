@@ -70,7 +70,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 20),
                     StyledFormField(
                       controller: emailAddressController,
-                      validator: validateEmail,
+                      validator: validateCap,
                       textStyle: const TextStyle(color: Colors.white),
                       decoration: formS(
                         "Email",
@@ -85,6 +85,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 20),
                     StyledFormField(
                       controller: passwordController,
+                      validator: validateCap,
                       textStyle: const TextStyle(color: Colors.white),
                       isPassword: true,
                       decoration: formS(
@@ -245,9 +246,12 @@ class _LoginState extends State<Login> {
             'Login failed due to network error';
       });
     } catch (error) {
-      setState(() {
-        errorMessage = "$error";
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(error.toString().replaceAll("Exception: ", "")),
+        ),
+      );
     } finally {
       setState(() {
         isLoading = false;

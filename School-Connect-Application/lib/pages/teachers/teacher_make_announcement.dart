@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
 import 'package:scs/misc/pickers.dart';
+import 'package:scs/misc/validators.dart';
 import 'package:scs/models/announcement/announcement.dart';
 import 'package:scs/models/group/group.dart';
 import 'package:scs/models/principal/principal.dart';
@@ -34,8 +35,11 @@ class _TeacherMakeSchoolAnnouncementPage
     super.initState();
   }
 
+  final _formKey = GlobalKey<FormState>();
+
   TextEditingController titleController = TextEditingController();
   TextEditingController messageController = TextEditingController();
+
   bool sendE = false;
   bool sendSms = false;
   bool scheduleAn = false;
@@ -52,8 +56,7 @@ class _TeacherMakeSchoolAnnouncementPage
   Announcement announcement = Announcement();
   String actorRole = '';
 
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  DateTime? selectedDateAndTime;
 
   @override
   Widget build(BuildContext context) {
@@ -79,158 +82,152 @@ class _TeacherMakeSchoolAnnouncementPage
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              Text("${teacher.role} Make Announcement"),
-              const Text(
-                "Title:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              StyledFormField(
-                controller: titleController,
-                decoration: formS("", "Enter title", Icons.edit),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Recipients:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-
-              // Column(
-              //   children: [
-              //     for (var grp in groups) ...[
-              //       Text("${grp.groupName}"),
-              //     ]
-              //   ],
-              // ),
-
-              MultiSelectDialogField(
-                buttonIcon: const Icon(Icons.book),
-                buttonText: const Text("Recipients"),
-                searchable: true,
-                isDismissible: true,
-                selectedColor: Colors.black87,
-                listType: MultiSelectListType.LIST,
-                items: groups
-                    .map(
-                        (group) => MultiSelectItem(group, "${group.groupName}"))
-                    .toList(),
-                onConfirm: (values) {
-                  setState(() {
-                    selectedGroupNames = values
-                        .map((group) => (group).groupName ?? "")
-                        .join(", ");
-                  });
-                },
-                title: const Text("Select groups"),
-                decoration: const BoxDecoration(
-                  color: Colors.black38,
-                  borderRadius: BorderRadius.all(Radius.circular(9)),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                    "Make Announcement here: ${teacher.name} ${teacher.surname}"),
+                const Text(
+                  "Title:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ),
-
-              const SizedBox(height: 20),
-              const Text(
-                "Message:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                maxLines: 5,
-                controller: messageController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter message',
+                const SizedBox(height: 10),
+                StyledFormField(
+                  validator: validateCap,
+                  controller: titleController,
+                  decoration: formS("", "Enter title", Icons.edit),
                 ),
-              ),
-              const SizedBox(height: 20),
-              // Checkbox for "Send an email and SMS"
-              CheckB(
-                icon: Icons.check_box,
-                icon2: Icons.square,
-                from: "Send an e-mail",
-                mess: "",
-                onToggle: (esms) {
-                  sendE = esms;
-                },
-              ),
-              // Checkbox for "Schedule your announcement"
-              const SizedBox(height: 10),
-              CheckB(
-                icon: Icons.check_box,
-                icon2: Icons.square,
-                from: "Send an sms",
-                mess: "",
-                onToggle: (esms) {
-                  sendSms = esms;
-                },
-              ),
-              // Checkbox for "Show On"
-              const SizedBox(height: 10),
-              CheckB(
-                icon: Icons.check_box,
-                icon2: Icons.square,
-                from: "Schedule your announcement",
-                mess: "",
-                onToggle: (esms) {
-                  setState(() {
-                    scheduleAn = esms;
-                  });
-                },
-              ),
-              Column(
-                children: [
-                  if (scheduleAn == true) ...[
-                    const SizedBox(height: 10),
-                    CheckB(
-                      icon: Icons.check,
-                      from: "Show On",
-                      mess: "",
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: DatePickerM(initialDate: datePicked),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: TimePicker(initialDateTime: dateTime),
-                        ),
-                      ],
-                    ),
-                  ]
-                ],
-              ),
-              const SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(120, 0, 120, 0),
-                child: rslButton(context, "SEND", () {
-                  setState(() {
-                    announcement = Announcement(
-                      announcementId: 0,
-                      title: titleController.text,
-                      recipients: [selectedGroupNames],
-                      content: messageController.text,
-                      sendEmail: sendE,
-                      sendSMS: sendSms,
-                      scheduleForLater: scheduleAn,
-                      timeToPost: DateTime.now(),
-                      principalID: null,
-                      teacherID: teacher.id,
-                      schoolID: teacher.schoolID,
-                      dateCreated: DateTime.now(),
-                    );
-                  });
+                const SizedBox(height: 20),
+                const Text(
+                  "Recipients:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
 
-                  createAnnouncement();
-                }),
-              ),
-            ],
+                MultiSelectDialogField(
+                  buttonIcon: const Icon(Icons.book),
+                  buttonText: const Text("Recipients"),
+                  searchable: true,
+                  isDismissible: true,
+                  selectedColor: Colors.black87,
+                  listType: MultiSelectListType.LIST,
+                  items: groups
+                      .map((group) =>
+                          MultiSelectItem(group, "${group.groupName}"))
+                      .toList(),
+                  onConfirm: (values) {
+                    setState(() {
+                      selectedGroupNames = values
+                          .map((group) => (group).groupName ?? "")
+                          .join(", ");
+                    });
+                  },
+                  title: const Text("Select groups"),
+                  decoration: const BoxDecoration(
+                    color: Colors.black38,
+                    borderRadius: BorderRadius.all(Radius.circular(9)),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+                const Text(
+                  "Message:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  maxLines: 5,
+                  controller: messageController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Enter message',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Checkbox for "Send an email and SMS"
+                CheckB(
+                  icon: Icons.check_box,
+                  icon2: Icons.square,
+                  from: "Send an e-mail",
+                  mess: "",
+                  onToggle: (esms) {
+                    sendE = esms;
+                  },
+                ),
+                // Checkbox for "Schedule your announcement"
+                const SizedBox(height: 10),
+                CheckB(
+                  icon: Icons.check_box,
+                  icon2: Icons.square,
+                  from: "Send an sms",
+                  mess: "",
+                  onToggle: (esms) {
+                    sendSms = esms;
+                  },
+                ),
+                // Checkbox for "Show On"
+                const SizedBox(height: 10),
+                CheckB(
+                  icon: Icons.check_box,
+                  icon2: Icons.square,
+                  from: "Schedule your announcement",
+                  mess: "",
+                  onToggle: (esms) {
+                    setState(() {
+                      scheduleAn = esms;
+                    });
+                  },
+                ),
+                Column(
+                  children: [
+                    if (scheduleAn == true) ...[
+                      const SizedBox(height: 10),
+                      CheckB(
+                        icon: Icons.check,
+                        from: "Show On",
+                        mess: "",
+                      ),
+                      DateTimePicker(
+                        onDateTimeSelected: (dateTim) {
+                          setState(() {
+                            selectedDateAndTime = dateTim;
+                          });
+                        },
+                      )
+                    ]
+                  ],
+                ),
+                const SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(120, 0, 120, 0),
+                  child: rslButton(context, "SEND", () {
+                    setState(() {
+                      //Come back for viewed Recipients
+
+                      announcement = Announcement(
+                        announcementId: 0,
+                        title: titleController.text,
+                        recipients: [selectedGroupNames],
+                        content: messageController.text,
+                        sendEmail: sendE,
+                        sendSMS: sendSms,
+                        scheduleForLater: scheduleAn,
+                        timeToPost: selectedDateAndTime,
+                        principalID: null,
+                        teacherID: teacher.id,
+                        schoolID: teacher.schoolID,
+                        dateCreated: DateTime.now(),
+                      );
+                    });
+
+                    createAnnouncement();
+                  }),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -270,8 +267,13 @@ class _TeacherMakeSchoolAnnouncementPage
         ),
       );
     } catch (error) {
-      log("$error");
-      errorMessage = "$error";
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+              "Failed to make announcement. Make sure all field are filled in correctly."),
+        ),
+      );
     } finally {
       setState(() {
         isLoading = false; // Disable loading state

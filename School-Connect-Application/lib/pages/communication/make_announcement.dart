@@ -30,15 +30,15 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
   }
 
   Future<void> fetchData() async {
-    if (principal != null) {
-      await getPrincipal("Principal/GetPrincipalById?id=");
-    } else if (teacher != null) {
-      await getTeacher("Teacher/GetTeacherById?id=");
-    }
+    await getPrincipal("Principal/GetPrincipalById?id=");
+    await getTeacher("Teacher/GetTeacherById?id=");
   }
 
   TextEditingController titleController = TextEditingController();
   TextEditingController messageController = TextEditingController();
+  TextEditingController selectedDate = TextEditingController();
+  TextEditingController selectedTime = TextEditingController();
+
   bool sendE = false;
   bool sendSms = false;
   bool scheduleAn = false;
@@ -52,9 +52,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
   Teacher teacher = Teacher();
   Announcement announcement = Announcement();
   String actorRole = '';
-
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  DateTime? selectedDateAndTime;
 
   @override
   Widget build(BuildContext context) {
@@ -207,11 +205,11 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(left: 16),
-                          child: DatePickerM(initialDate: datePicked),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: TimePicker(initialDateTime: dateTime),
+                          child: DateTimePicker(
+                            onDateTimeSelected: (p0) {
+                              selectedDateAndTime = p0;
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -324,7 +322,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
         if (response.data['Success'] == true) {
           setState(() {
             principal = Principal.fromJson(result);
-            actorRole = "${principal.role! ?? ""}";
+            actorRole = principal.role!;
 
             log("Mapped SystemAdmin: Name: ${principal.name}, Email: ${principal.emailAddress}, School Name: ${principal.principalSchoolNP!.name}");
             isLoading = false;
@@ -355,7 +353,7 @@ class _MakeSchoolAnnouncementPage extends State<MakeSchoolAnnouncementPage> {
       if (response.statusCode == 200) {
         setState(() {
           teacher = Teacher.fromJson(response.data);
-          actorRole = "${teacher.role ?? ""}";
+          actorRole = teacher.role ?? "";
 
           // Set values to controllers after data is fetched
 

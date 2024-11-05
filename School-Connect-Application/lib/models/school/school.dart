@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:scs/models/announcement/announcement.dart';
+import 'package:scs/models/attendence/attendence.dart';
 import 'package:scs/models/group/group.dart';
 import 'package:scs/models/learner/learner.dart';
 import 'package:scs/models/principal/principal.dart';
@@ -80,6 +81,7 @@ class School {
     this.schoolGroupsNP,
     this.schoolSysAdminNP,
     this.schoolLogoFile,
+    this.attendanceRecords,
   });
 
   //Navigation Properties or Relationships
@@ -103,6 +105,9 @@ class School {
 
   @JsonKey(name: "schoolPrincipalNP")
   Principal? schoolPrincipalNP; //One to one
+
+  @JsonKey(name: "attendanceRecords")
+  List<Attendence>? attendanceRecords; //One to one
 
   factory School.fromJson(Map<String, dynamic> json) => _$SchoolFromJson(json);
 

@@ -1,148 +1,111 @@
 import 'package:flutter/material.dart';
 
-// Date Picker
-class DatePickerM extends StatefulWidget {
-  final DateTime? initialDate;
+class DateTimePicker extends StatefulWidget {
+  final DateTime? initialDateTime;
+  final Function(DateTime) onDateTimeSelected; // Callback to return DateTime
 
-  const DatePickerM({super.key, this.initialDate});
+  const DateTimePicker({
+    super.key,
+    this.initialDateTime,
+    required this.onDateTimeSelected,
+  });
 
   @override
-  State<DatePickerM> createState() => _DatePickerMState();
+  State<DateTimePicker> createState() => _DateTimePickerState();
 }
 
-class _DatePickerMState extends State<DatePickerM> {
-  DateTime selectedDateTime =
-      DateTime.now(); // Initialize with current date and time
+class _DateTimePickerState extends State<DateTimePicker> {
   late DateTime _selectedDate;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDate = widget.initialDate ?? DateTime.now();
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2030),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          '${_selectedDate.toLocal()}'.split(' ')[0],
-        ),
-        const SizedBox(height: 10.0),
-        SizedBox(
-          height: 50,
-          width: 120,
-          child: FloatingActionButton(
-            hoverElevation: 0,
-            backgroundColor: const Color(0xFF0F2E34),
-            onPressed: () => _selectDate(context),
-            child: const Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 8),
-                  child: Icon(
-                    Icons.calendar_month,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(width: 5),
-                Text(
-                  'Select date',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// Time Picker
-class TimePicker extends StatefulWidget {
-  final DateTime? initialDateTime; // Nullable DateTime
-
-  const TimePicker({super.key, this.initialDateTime});
-
-  @override
-  State<TimePicker> createState() => _TimePickerState();
-}
-
-class _TimePickerState extends State<TimePicker> {
   late TimeOfDay _selectedTime;
 
   @override
   void initState() {
     super.initState();
+    _selectedDate = widget.initialDateTime ?? DateTime.now();
     _selectedTime = widget.initialDateTime != null
-        ? TimeOfDay.fromDateTime(
-            widget.initialDateTime!) // Use passed DateTime if not null
-        : TimeOfDay.now(); // Default to current time if null
+        ? TimeOfDay.fromDateTime(widget.initialDateTime!)
+        : TimeOfDay.now();
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+  Future<void> _selectDateTime(BuildContext context) async {
+    // Select Date
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialTime: _selectedTime,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(2030),
     );
-    if (picked != null && picked != _selectedTime) {
+
+    if (pickedDate != null) {
       setState(() {
-        _selectedTime = picked;
+        _selectedDate = pickedDate;
       });
+
+      // Select Time
+      final TimeOfDay? pickedTime = await showTimePicker(
+        initialTime: _selectedTime,
+        context: context,
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          _selectedTime = pickedTime;
+        });
+
+        // Call the callback with the selected DateTime
+        widget.onDateTimeSelected(selectedDateTime);
+      }
     }
+  }
+
+  DateTime get selectedDateTime {
+    // Combine selected date and time into a single DateTime
+    return DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+      _selectedTime.hour,
+      _selectedTime.minute,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          _selectedTime.format(context),
-        ),
-        const SizedBox(height: 10.0),
-        SizedBox(
-          height: 50,
-          width: 120,
-          child: FloatingActionButton(
-            hoverElevation: 0,
-            backgroundColor: const Color(0xFF0F2E34),
-            onPressed: () => _selectTime(context),
-            child: const Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 8),
-                  child: Icon(
-                    Icons.lock_clock,
-                    color: Colors.white,
-                  ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Selected: ${selectedDateTime.toIso8601String()}',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: SizedBox(
+              height: 50,
+              width: 200,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0F2E34),
                 ),
-                SizedBox(width: 5),
-                Text(
-                  'Select Time',
-                  style: TextStyle(color: Colors.white),
+                onPressed: () => _selectDateTime(context),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.calendar_today, color: Colors.white),
+                    SizedBox(width: 5),
+                    Text(
+                      'Select Date & Time',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -2,28 +2,27 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scs/models/principal/principal.dart';
 import 'package:scs/models/school/school.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
 
-class PrincipalLandingPage extends StatefulWidget {
-  const PrincipalLandingPage({super.key});
+class SchoolManagement extends StatefulWidget {
+  const SchoolManagement({super.key});
 
   @override
-  State<PrincipalLandingPage> createState() => _PrincipalLandingPageState();
+  State<SchoolManagement> createState() => _SchoolManagementState();
 }
 
-class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
+class _SchoolManagementState extends State<SchoolManagement> {
   bool isLoading = false;
   late HttpService http;
-  Principal principal = Principal();
   School school = School();
   @override
   void initState() {
     http = HttpService();
-    getUser("Principal/GetPrincipalById?id=");
+    getSchools("School/GetSchoolById?schoolId=");
+
     super.initState();
   }
 
@@ -67,7 +66,7 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
                     const SizedBox(height: 20),
                     // Name
                     Text(
-                      '${principal.title} ${principal.name} ${principal.surname}',
+                      '${school.name} ${school.type} School',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -76,31 +75,28 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
                     ),
                     const SizedBox(height: 30),
                     // Buttons
-
                     Padding(
                       padding: const EdgeInsets.only(left: 100, right: 100),
-                      child: _buildButton(context, 'View Profile',
-                          RouteManagerProvider.viewProfile),
+                      child: _buildButton(context, 'View School Info',
+                          RouteManagerProvider.principalUpdateSchool),
                     ),
                     const SizedBox(height: 50),
-                    _buildButton(context, 'Make Announcements',
-                        RouteManagerProvider.principalMakeAnnounce),
+                    _buildButton(context, 'Manage Teacher Class Assignment',
+                        RouteManagerProvider.principalAssignTeacherToClass),
                     const SizedBox(height: 30),
-                    _buildButton(context, 'View Announcements',
+                    _buildButton(context, 'Manage Announcement Groups',
                         RouteManagerProvider.principalListAnnounce),
                     const SizedBox(height: 30),
-                    _buildButton(
-                        context,
-                        'Manage ${principal.principalSchoolNP?.name} ${principal.principalSchoolNP?.type} School',
-                        RouteManagerProvider.principalManageSchool),
+                    _buildButton(context, 'Manage School',
+                        RouteManagerProvider.principalListAnnounce),
                     const SizedBox(height: 30),
-                    _buildButton(
-                        context, 'Grades', RouteManagerProvider.gradeOverview),
+                    _buildButton(context, 'Manage Grades',
+                        RouteManagerProvider.manageGrades),
                     const SizedBox(height: 40),
                     // Logout Button
                     GestureDetector(
                       onTap: () {
-                        logOut();
+                        Navigator.pop(context);
                       },
                       child: Container(
                         padding: const EdgeInsets.all(12),
@@ -115,7 +111,7 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
                         ),
                         child: const Center(
                           child: Text(
-                            'LOGOUT',
+                            'Back',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -160,54 +156,67 @@ class _PrincipalLandingPageState extends State<PrincipalLandingPage> {
     );
   }
 
-  Future<void> getUser(String url) async {
+  // Get School information
+  Future<void> getSchools(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
 
-    log('Role registration page');
-    log('current token $token');
+    setState(() {
+      isLoading = true;
+    });
+
     try {
-      setState(() {
-        isLoading = true;
-      });
-      log("fetching data...");
+      log("Fetching schools");
+
+      // Making the API request
       Response response = await http.getRequest("${http.baseUrl}$url$token");
+      log("School response code: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        var result = response.data['Result'];
-        if (response.data['Success'] == true) {
+      // Debugging: Print the entire response to verify its structure
+      log("Response data: ${response.data}");
+
+      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        var result = response.data;
+
+        // Check if result['Result'] exists and is a Map
+        if (result['Success'] == true && result['Result'] != null) {
+          var schoolData = result['Result'];
+
+          // Debugging: Print the schoolData to verify the content
+          log("Parsed school data: $schoolData");
+
           setState(() {
-            principal = Principal.fromJson(result);
+            school = School.fromJson(schoolData);
 
-            // Set values to controllers after data is fetched
-
-            log("Mapped SystemAdmin: Name: ${principal.name}, Email: ${principal.emailAddress}, School Name: ${principal.principalSchoolNP!.name}");
-            isLoading = false;
+            log("School name: ${school.name}");
           });
+          if (school == null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content:
+                    Text("Could not find a school linked to this admin's ID")));
+          }
+        } else {
+          log("Unexpected response format or 'Success' is false");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Unexpected response format')),
+          );
         }
+      } else {
+        log("Problem, statusCode: ${response.statusCode}, message: ${response.statusMessage}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Failed to load schools: ${response.statusMessage}')),
+        );
       }
-    } on Exception catch (e) {
+    } on DioException catch (e) {
       log("Error occurred: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load schools: $e')),
+      );
     } finally {
       setState(() {
         isLoading = false;
       });
-    }
-  }
-
-  Future<void> logOut() async {
-    try {
-      Response response = await http.postRequest(
-          "${http.baseUrl}SignIn/SignOut", principal.toJson());
-      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Logged out"),
-          ),
-        );
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      log("Exception while login out: $e");
     }
   }
 }

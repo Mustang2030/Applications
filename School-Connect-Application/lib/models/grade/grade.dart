@@ -10,8 +10,8 @@ class Grade {
   @JsonKey(name: "id")
   int? id;
 
-  @JsonKey(name: "classDesignate")
-  String? classDesignate;
+  @JsonKey(name: "gradeDesignate")
+  String? gradeDesignate;
 
   //Foreign Key
   @JsonKey(name: "schoolId")
@@ -21,12 +21,12 @@ class Grade {
   @JsonKey(name: "gradeScholNP")
   School? gradeScholNP;
 
-  @JsonKey(name: "class")
+  @JsonKey(name: "classes")
   List<SubGrade>? classes;
 
   Grade({
     this.id,
-    this.classDesignate,
+    this.gradeDesignate,
     this.schoolId,
     this.gradeScholNP,
     this.classes,

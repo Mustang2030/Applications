@@ -144,13 +144,6 @@ class _SLoginState extends State<SLogin> {
                             hintTextColor: Colors.white),
                       ),
                       const SizedBox(height: 20),
-                      Center(
-                        child: Text(
-                          errorMessage,
-                          style: TextStyle(color: Colors.red, fontSize: 18),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -196,10 +189,10 @@ class _SLoginState extends State<SLogin> {
         userChangePassword();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password changed successfully')),
+          const SnackBar(
+              backgroundColor: Colors.red,
+              content: Text('Password changed successfully')),
         );
-        // Navigate back to login screen or home screen
-        // Navigator.of(context).pushReplacementNamed('/login');
       }
     }
   }
@@ -234,10 +227,12 @@ class _SLoginState extends State<SLogin> {
       setState(() {
         errorMessage = handleDioError(dioError) ?? 'Network error';
       });
-    } catch (error) {
-      setState(() {
-        errorMessage = "$error";
-      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(e.toString().replaceAll("Exception:", ""))),
+      );
     } finally {
       setState(() {
         isLoading = false;

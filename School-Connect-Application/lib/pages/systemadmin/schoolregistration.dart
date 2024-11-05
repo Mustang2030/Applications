@@ -250,7 +250,6 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
           setState(() {
             systemAdmin = SystemAdmin.fromJson(result);
             // Set values to controllers after data is fetched
-
             log("Mapped SystemAdmin: Name: ${systemAdmin.name}, Email: ${systemAdmin.emailAddress}, ID: ${systemAdmin.id}");
             isLoading = false;
           });
@@ -274,7 +273,9 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
     // Add your validation logic here
     if (emisNumber.text.isEmpty || schoolName.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
+        const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Please fill in all fields")),
       );
       return false;
     }
@@ -341,6 +342,7 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
         log("Registered");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            backgroundColor: Colors.green,
             content: Text("You have successfully registered your school"),
           ),
         );
@@ -348,6 +350,7 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            backgroundColor: Colors.red,
             content: Text("Failed to register the school. Please try again."),
           ),
         );
@@ -358,6 +361,7 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
       log("DioError occurred: $dioError");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          backgroundColor: Colors.red,
           content: Text("Could not register the school"),
         ),
       );

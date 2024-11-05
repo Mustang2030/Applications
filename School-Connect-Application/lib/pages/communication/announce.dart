@@ -44,6 +44,7 @@ class _AnnouncementsState extends State<Announcements> {
   Teacher teacher = Teacher();
   Announcement announcement = Announcement();
   String actorRole = '';
+  DateTime? selectedDateAndTime;
 
   @override
   Widget build(BuildContext context) {
@@ -155,11 +156,11 @@ class _AnnouncementsState extends State<Announcements> {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(left: 16),
-                          child: DatePickerM(initialDate: datePicked),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: TimePicker(initialDateTime: dateTime),
+                          child: DateTimePicker(
+                            onDateTimeSelected: (p0) {
+                              selectedDateAndTime = p0;
+                            },
+                          ),
                         ),
                       ],
                     ),

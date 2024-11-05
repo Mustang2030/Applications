@@ -28,11 +28,9 @@ School _$SchoolFromJson(Map<String, dynamic> json) => School(
           ? null
           : Principal.fromJson(
               json['schoolPrincipalNP'] as Map<String, dynamic>),
-      schoolTeachersNP: json['schoolTeachersNP'] == null
-          ? null
-          : (json['schoolTeachersNP'] as List<dynamic>?)
-              ?.map((e) => Teacher.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      schoolTeachersNP: (json['schoolTeachersNP'] as List<dynamic>?)
+          ?.map((e) => Teacher.fromJson(e as Map<String, dynamic>))
+          .toList(),
       schoolAnnouncementNP: (json['schoolAnnouncementNP'] as List<dynamic>?)
           ?.map((e) => Announcement.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -43,6 +41,9 @@ School _$SchoolFromJson(Map<String, dynamic> json) => School(
           ? null
           : SystemAdmin.fromJson(
               json['schoolSysAdminNP'] as Map<String, dynamic>),
+      attendanceRecords: (json['attendanceRecords'] as List<dynamic>?)
+          ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$SchoolToJson(School instance) => <String, dynamic>{
@@ -62,4 +63,5 @@ Map<String, dynamic> _$SchoolToJson(School instance) => <String, dynamic>{
       'schoolSysAdminNP': instance.schoolSysAdminNP,
       'schoolGroupsNP': instance.schoolGroupsNP,
       'schoolPrincipalNP': instance.schoolPrincipalNP,
+      'attendanceRecords': instance.attendanceRecords,
     };

@@ -51,8 +51,7 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
   String actorRole = '';
   late List<Group> groups = [];
 
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  DateTime? selectedDateAndTime;
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +115,6 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
                         .map((group) => (group).groupName ?? "")
                         .join(", ");
                   });
-                  // for (var grp in groups) {
-                  //   MultiSelectItem(grp.groupName, grp.groupName!);
-                  // }
-                  // groups = values;
                 },
                 title: const Text("Select groups"),
                 decoration: const BoxDecoration(
@@ -186,18 +181,13 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
                       from: "Show On",
                       mess: "",
                     ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: DatePickerM(initialDate: datePicked),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: TimePicker(initialDateTime: dateTime),
-                        ),
-                      ],
-                    ),
+                    DateTimePicker(
+                      onDateTimeSelected: (dateTim) {
+                        setState(() {
+                          selectedDateAndTime = dateTim;
+                        });
+                      },
+                    )
                   ]
                 ],
               ),
@@ -214,7 +204,7 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
                       sendEmail: sendE,
                       sendSMS: sendSms,
                       scheduleForLater: scheduleAn,
-                      timeToPost: DateTime.now(),
+                      timeToPost: selectedDateAndTime,
                       principalID: principal.id,
                       teacherID: null,
                       schoolID: principal.schoolID,
@@ -243,6 +233,7 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
         log("Announcement made");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            backgroundColor: Colors.green,
             content: Text("Announcement has been made"),
           ),
         );
@@ -250,6 +241,7 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            backgroundColor: Colors.red,
             content: Text("Failed to make announcement"),
           ),
         );
@@ -259,7 +251,8 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
       log("DioError occurred: $dioError");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Could not register the school"),
+          backgroundColor: Colors.red,
+          content: Text("Could not make the announcement`   "),
         ),
       );
     } catch (error) {
@@ -301,5 +294,11 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
         isLoading = false;
       });
     }
+  }
+
+  void _timeToPost(DateTime dateTin) {
+    setState(() {
+      selectedDateAndTime = dateTin;
+    });
   }
 }

@@ -208,4 +208,13 @@ class _PrincipalListAnnouncementsPageState
       log("Put me into your blody arms${e.response!.data}");
     }
   }
+
+  Future<void> editAnnouncement() async {
+    try {
+      Response response = await http.putRequest(
+          "${http.baseUrl}Announcement/Update", announcements);
+    } on DioException catch (e) {
+      log("Error bro: $e");
+    }
+  }
 }

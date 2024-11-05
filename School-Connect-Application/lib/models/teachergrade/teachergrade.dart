@@ -11,7 +11,7 @@ class TeacherGrade {
   int? teacherID;
 
   @JsonKey(name: "staffNr")
-  int? staffNr;
+  String? staffNr;
 
   //Foreign Key
   @JsonKey(name: "teacher")

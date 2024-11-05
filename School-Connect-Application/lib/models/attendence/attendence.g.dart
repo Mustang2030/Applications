@@ -7,28 +7,39 @@ part of 'attendence.dart';
 // **************************************************************************
 
 Attendence _$AttendenceFromJson(Map<String, dynamic> json) => Attendence(
-      attendenceId: (json['attendenceId'] as num).toInt(),
-      mondayDate: json['mondayDate'] as bool,
-      tuesdayDate: json['tuesdayDate'] as bool,
-      wednesdayDate: json['wednesdayDate'] as bool,
-      thursdayDate: json['thursdayDate'] as bool,
-      fridayDate: json['fridayDate'] as bool,
-      learnerId: (json['learnerId'] as num).toInt(),
-      teacherId: (json['teacherId'] as num).toInt(),
-      learnerNP: Learner.fromJson(json['learnerNP'] as Map<String, dynamic>),
-      teacherNP: Teacher.fromJson(json['teacherNP'] as Map<String, dynamic>),
+      attendenceId: (json['attendenceId'] as num?)?.toInt(),
+      date:
+          json['date'] == null ? null : DateTime.parse(json['date'] as String),
+      status: json['status'] as bool?,
+      learnerId: (json['learnerId'] as num?)?.toInt(),
+      teacherId: (json['teacherId'] as num?)?.toInt(),
+      classId: (json['classId'] as num?)?.toInt(),
+      schoolId: (json['schoolId'] as num?)?.toInt(),
+      learnerNP: json['learnerNP'] == null
+          ? null
+          : Learner.fromJson(json['learnerNP'] as Map<String, dynamic>),
+      teacherNP: json['teacherNP'] == null
+          ? null
+          : Teacher.fromJson(json['teacherNP'] as Map<String, dynamic>),
+      clas: json['class'] == null
+          ? null
+          : SubGrade.fromJson(json['class'] as Map<String, dynamic>),
+      school: json['school'] == null
+          ? null
+          : School.fromJson(json['school'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$AttendenceToJson(Attendence instance) =>
     <String, dynamic>{
       'attendenceId': instance.attendenceId,
-      'mondayDate': instance.mondayDate,
-      'tuesdayDate': instance.tuesdayDate,
-      'wednesdayDate': instance.wednesdayDate,
-      'thursdayDate': instance.thursdayDate,
-      'fridayDate': instance.fridayDate,
+      'date': instance.date?.toIso8601String(),
+      'status': instance.status,
       'learnerId': instance.learnerId,
       'teacherId': instance.teacherId,
-      'learnerNP': instance.learnerNP,
+      'classId': instance.classId,
+      'schoolId': instance.schoolId,
       'teacherNP': instance.teacherNP,
+      'learnerNP': instance.learnerNP,
+      'class': instance.clas,
+      'school': instance.school,
     };

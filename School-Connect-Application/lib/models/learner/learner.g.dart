@@ -30,6 +30,9 @@ Learner _$LearnerFromJson(Map<String, dynamic> json) => Learner(
       parents: (json['parents'] as List<dynamic>?)
           ?.map((e) => LearnerParent.fromJson(e as Map<String, dynamic>))
           .toList(),
+      attendenceRecords: (json['attendenceRecords'] as List<dynamic>?)
+          ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$LearnerToJson(Learner instance) => <String, dynamic>{
@@ -48,4 +51,5 @@ Map<String, dynamic> _$LearnerToJson(Learner instance) => <String, dynamic>{
       'learnerSchoolNP': instance.learnerSchoolNP,
       'parents': instance.parents,
       'class': instance.clas,
+      'attendenceRecords': instance.attendenceRecords,
     };

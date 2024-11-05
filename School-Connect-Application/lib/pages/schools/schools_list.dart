@@ -25,7 +25,7 @@ class _SchoolsListState extends State<SchoolsList> {
   bool isLoading = false;
   Parent parent = Parent();
   Learner learner = Learner(parents: []);
-  LearnerParent learnerParent = LearnerParent();
+  List<LearnerParent> learnerParent = [];
   School school = School();
   List<Learner> learners = [];
 
@@ -161,8 +161,7 @@ class _SchoolsListState extends State<SchoolsList> {
 
         setState(() {
           parent = Parent.fromJson(result);
-          learner = Learner.fromJson(result);
-          learnerParent = LearnerParent.fromJson(result);
+          learnerParent = parent.children!;
           // Set values to controllers after data is fetched
           // nameController.text = parent.name ?? '';
           // surnameController.text = parent.surname ?? '';
@@ -173,6 +172,8 @@ class _SchoolsListState extends State<SchoolsList> {
           log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
           isLoading = false;
         });
+        // learnerParent =
+        //     learnerParent.iterator.current.learner!.id as List<LearnerParent>;
         getLearner("Learner/GetLearnerById?id=");
       } else {
         log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
@@ -192,7 +193,9 @@ class _SchoolsListState extends State<SchoolsList> {
   Future<void> getLearner(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
 
-    token = learner.id.toString();
+    // for(var kid in parent.children)
+
+    token = learnerParent.first.learner!.id.toString();
     try {
       setState(() {
         isLoading = true;
@@ -204,9 +207,7 @@ class _SchoolsListState extends State<SchoolsList> {
         var result = response.data['Result'];
 
         setState(() {
-          parent = Parent.fromJson(result);
           learner = Learner.fromJson(result);
-          learnerParent = LearnerParent.fromJson(result);
           learners = [learner].sublist(learners.length);
           // Set values to controllers after data is fetched
           // nameController.text = parent.name ?? '';
@@ -218,7 +219,7 @@ class _SchoolsListState extends State<SchoolsList> {
             getSchools("School/GetSchoolById?schoolId=");
           }
 
-          log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
+          log("Mapped Leaner: Name: ${learner.name}, ID: ${learner.id}, ID: ${learner.role}");
           isLoading = false;
         });
       } else {

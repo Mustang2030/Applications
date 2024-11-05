@@ -8,7 +8,7 @@ part of 'teachergrade.dart';
 
 TeacherGrade _$TeacherGradeFromJson(Map<String, dynamic> json) => TeacherGrade(
       teacherID: (json['teacherID'] as num?)?.toInt(),
-      staffNr: (json['staffNr'] as num?)?.toInt(),
+      staffNr: json['staffNr'] as String?,
       teacher: json['teacher'] == null
           ? null
           : Teacher.fromJson(json['teacher'] as Map<String, dynamic>),

@@ -33,12 +33,16 @@ Learner _$LearnerFromJson(Map<String, dynamic> json) => Learner(
       attendenceRecords: (json['attendenceRecords'] as List<dynamic>?)
           ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+    )
+      ..profileImageBase64 = json['profileImageBase64'] as String?
+      ..profileImageType = json['profileImageType'] as String?;
 
 Map<String, dynamic> _$LearnerToJson(Learner instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,

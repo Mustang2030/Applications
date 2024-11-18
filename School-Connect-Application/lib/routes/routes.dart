@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scs/pages/child/attendance.dart';
 import 'package:scs/pages/child/teacher_mark_attendence.dart';
 import 'package:scs/pages/child/report.dart';
+import 'package:scs/pages/parent/chat/parent_chat_screen.dart';
 import 'package:scs/pages/parent/parent_landing_page.dart';
 // import 'package:scs/pages/parent/parentlandingpage.dart';
 import 'package:scs/pages/parent/parent_view_list_announcements.dart';
@@ -28,6 +29,7 @@ import 'package:scs/pages/systemadmin/rolesregistration.dart';
 import 'package:scs/pages/systemadmin/schoolregistration.dart';
 import 'package:scs/pages/systemadmin/sysadminViewProf.dart';
 import 'package:scs/pages/systemadmin/systemadminlanding.dart';
+import 'package:scs/pages/teachers/subj_class_roaster/subj_class_roaster.dart';
 import 'package:scs/pages/teachers/teacher_class_roaster.dart';
 import 'package:scs/pages/principal/attendence.dart';
 import 'package:scs/pages/principal/principal_view_list_announcements.dart';
@@ -38,18 +40,16 @@ import 'package:scs/pages/principal/teachprof.dart';
 import 'package:scs/pages/teachers/teacher_make_announcement.dart';
 import 'package:scs/pages/teachers/teacher_view_detail_announcement.dart';
 import 'package:scs/pages/teachers/teacher_view_list_announcements.dart';
-import 'package:scs/pages/teachers/teacherchatlist.dart';
+import 'package:scs/pages/teachers/chat/teacherchatlist.dart';
 import 'package:scs/reg_and_log/slogin.dart';
 import 'package:scs/pages/teachers/childprot.dart';
-import 'package:scs/pages/teachers/classroaste.dart';
 import 'package:scs/pages/teachers/makereport.dart';
-import 'package:scs/pages/teachers/subj.dart';
+import 'package:scs/pages/teachers/subj_class_roaster/subj.dart';
 import 'package:scs/pages/teachers/teacher_landing_page.dart';
 import 'package:scs/pages/communication/announce.dart';
-import 'package:scs/pages/communication/chat_screen.dart';
-import 'package:scs/pages/communication/contact_list.dart';
+import 'package:scs/pages/teachers/chat/chat_screen.dart';
+import 'package:scs/pages/parent/chat/parent_chat_list.dart';
 import 'package:scs/pages/communication/pcontactlist.dart';
-import 'package:scs/pages/parent/announcement.dart';
 import 'package:scs/pages/child/childpro.dart';
 import 'package:scs/pages/communication/detailed_announce.dart';
 import 'package:scs/pages/parent/parent_view_profile.dart';
@@ -65,7 +65,6 @@ class RouteManagerProvider {
       teacherp = '/teacherp',
       schoolregistration = '/schoolregistration',
       roleregistration = '/roleregistration',
-      contactlist = '/contactlist',
       pcontactlist = '/pcontactlist',
       chatscreen = '/chatscreen',
       announce = '/announce',
@@ -75,14 +74,11 @@ class RouteManagerProvider {
       dannounce = '/dannounce',
       report = '/report',
       pprofile = '/pprofile',
-      mattendence = '/mattendence',
       schoolsList = '/schoolsList',
       subjectt = '/subjectt',
-      classroaster = '/classroaster',
       childprot = '/childprot',
       makereport = '/makereport',
       tdetails = '/tdetails',
-      subj = '/subj',
       gradespv = '/gradespv',
       teachprofpv = '/teachprofpv',
       attendencepv = '/attendencepv',
@@ -108,12 +104,19 @@ class RouteManagerProvider {
       parent = '/parent',
       parentViewListAnnouncemnt = '/parentViewListAnnouncemnt',
       parenViewDetailAnnouncement = "/parenViewDetailAnnouncement",
+      contactlist = '/contactlist',
+      parentChatScreen = '/parentChatScreen',
 
       // Teacher
       teacherViewListAnnouncent = '/teacherViewListAnnouncent',
       teacherMakeAnnouncement = "/teacherMakeAnnouncement",
       teacherViewDetailAnnouncement = "/teacherDetailViewAnnouncement",
       teacherClassRoaster = '/teacherClassRoaster',
+      teacherChatList = '/teacherChatList',
+      chatScreen = '/chatScreen',
+      subj = '/subj',
+      subjClassRoaster = '/subjClassRoaster',
+      mattendence = '/mattendence',
 
       // Learner
       gradeView = '/gradeView',
@@ -132,13 +135,11 @@ class RouteManagerProvider {
       sysadminviewprofile = '/sysadminviewprofile',
       //Parents Routes
       parentlanding = '/parentlanding',
-      parentChatListPage = 'parent_chat_page',
       parentViewChildProf = 'parent_view_child_prof',
       parentViewAttendance = 'parent_view_attendance',
       parentViewann = 'parent_view_ann',
       parentSchoolPofile = 'parent_school_profile',
       parentDetailedAnn = 'parent_detail_ann',
-      chatScreen = 'chat',
       parentViewProf = 'parent_view_prof',
       parentViewReport = 'parent_view_report';
 
@@ -217,6 +218,15 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const SchoolsList(),
         );
+      case contactlist:
+        return MaterialPageRoute(
+          builder: (context) => const ContactList(),
+        );
+      case parentChatScreen:
+        return MaterialPageRoute(
+          builder: (context) => const ParentChatScreen(),
+        );
+
       // Teacher
       case teacherMakeAnnouncement:
         return MaterialPageRoute(
@@ -231,11 +241,19 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const TeacherClassRoaster(),
         );
-
-      case contactlist:
+      case teacherChatList:
+        return MaterialPageRoute(builder: (context) => UserChatList());
+      case chatScreen:
+        return MaterialPageRoute(builder: (context) => const ChatScreen());
+      case subj:
         return MaterialPageRoute(
-          builder: (context) => const ContactList(),
+          builder: (context) => const Subject(),
         );
+      case subjClassRoaster:
+        return MaterialPageRoute(
+          builder: (context) => const SubjClassRoaster(),
+        );
+
       case pcontactlist:
         return MaterialPageRoute(
           builder: (context) => const PContactList(),
@@ -256,10 +274,7 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const Attendance(),
         );
-      case announcementS:
-        return MaterialPageRoute(
-          builder: (context) => const AnnouncementS(),
-        );
+
       case report:
         return MaterialPageRoute(
           builder: (context) => const Report(),
@@ -291,10 +306,7 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const TeacherP(),
         );
-      case classroaster:
-        return MaterialPageRoute(
-          builder: (context) => const ClassRoaster(),
-        );
+
       case makereport:
         return MaterialPageRoute(
           builder: (context) => const MakeReport(),
@@ -303,10 +315,7 @@ class RouteManagerProvider {
         return MaterialPageRoute(
           builder: (context) => const TeacherDetails(),
         );
-      case subj:
-        return MaterialPageRoute(
-          builder: (context) => const Subject(),
-        );
+
       case gradespv:
         return MaterialPageRoute(
           builder: (context) => const GradesPrince(),
@@ -350,14 +359,7 @@ class RouteManagerProvider {
             builder: (context) => ParentsAnnouncementsPage());
       // case parentDetailedAnn:
       //   return MaterialPageRoute(builder: (context) => parentDetailedAnn());
-      case chatScreen:
-        return MaterialPageRoute(
-            builder: (context) => const ChatScreen(
-                // contactName: '',
-                // contactImage: '',
-                ));
-      case parentChatListPage:
-        return MaterialPageRoute(builder: (context) => TChatListScreen());
+
       // case parentViewChildProf:
       //   return MaterialPageRoute(builder: (context) => parentViewChildProf);
       // case parentViewReport:

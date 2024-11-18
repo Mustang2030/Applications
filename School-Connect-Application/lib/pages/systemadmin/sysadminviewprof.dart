@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -87,12 +88,17 @@ class _ProfileViewSState extends State<ProfileViewS> {
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            //Remember to fix the update image
-            // Image.network(systemAdmin.profileImageFile as String),
             CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 70, color: Color(0xFF0F2E34)),
+              backgroundImage: systemAdmin.profileImageBase64 != null
+                  ? MemoryImage(base64Decode(systemAdmin.profileImageBase64!))
+                  : null,
+              child: systemAdmin.profileImageBase64 == null
+                  ? Icon(
+                      Icons.person,
+                      size: 55,
+                    )
+                  : null,
             ),
             SizedBox(height: 16),
             Text(
@@ -202,9 +208,7 @@ class _ProfileViewSState extends State<ProfileViewS> {
             systemAdmin = SystemAdmin.fromJson(result);
 
             _cellController.text = systemAdmin.phoneNumber.toString();
-            _emailController.text = systemAdmin.emailAddress!;
-            // Set values to controllers after data is fetche
-            log("Mapped SystemAdmin: Name: ${systemAdmin.name}, Email: ${systemAdmin.emailAddress}, School Name: ${systemAdmin.sysAdminSchoolNP!.name}");
+            _emailController.text = systemAdmin.emailAddress.toString();
             isLoading = false;
           });
         }

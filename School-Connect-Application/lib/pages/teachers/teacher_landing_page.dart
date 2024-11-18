@@ -8,7 +8,9 @@ import 'package:scs/models/learner/learner.dart';
 import 'package:scs/models/parent/parent.dart';
 import 'package:scs/models/principal/principal.dart';
 import 'package:scs/models/school/school.dart';
+import 'package:scs/models/subgrade/subgrade.dart';
 import 'package:scs/models/teacher/teacher.dart';
+import 'package:scs/models/teachergrade/teachergrade.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
@@ -37,6 +39,8 @@ class _TeacherPState extends State<TeacherP> {
   School school = School();
   bool isLoading = false;
   List<String> subjects = [];
+  List<TeacherGrade> classesT = [];
+  List<String> subTaught = [];
 
   @override
   Widget build(BuildContext context) {
@@ -114,17 +118,16 @@ class _TeacherPState extends State<TeacherP> {
                             RouteManagerProvider.teacherViewListAnnouncent,
                           ),
                           const SizedBox(height: 15),
-                          // Buttons
                           if (teacher.mainClass != null) ...[
                             _buildButton(context, 'Class Roaster',
                                 RouteManagerProvider.teacherClassRoaster),
-                          ] else if (teacher.mainClass == null) ...[
-                            rslButton(context, "Not A Class Teacher", () {})
-                          ],
+                          ] else if (teacher.mainClass == null) ...{
+                            _buildButton(context, 'Not Main A Teacher', ""),
+                          },
                           const SizedBox(height: 40),
 
                           const Text(
-                            "Subjects",
+                            "Subjects:",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -134,14 +137,36 @@ class _TeacherPState extends State<TeacherP> {
                           Column(
                             children: [
                               ...[
-                                for (var subject in subjects) ...[
-                                  sclButton(
-                                    context,
-                                    subject,
-                                    () {
-                                      // Navigator.pushNamed(context, RouteManagerProvider.);
-                                    },
-                                  )
+                                for (int i = 0;
+                                    i <= subjects.length - 1;
+                                    i++) ...[
+                                  if (teacher.classes != null) ...{
+                                    if (teacher.classes?.any((clas) =>
+                                            clas.clas?.subjectsTaught
+                                                ?.contains(subjects[i]) ??
+                                            false) ??
+                                        false) ...{
+                                      sclButton(
+                                        context,
+                                        subjects[i],
+                                        color: Color(0xFF0F2E34),
+                                        () {
+                                          //Fix before presenting on vid
+                                          Navigator.pushNamed(context,
+                                              RouteManagerProvider.subj);
+                                        },
+                                      )
+                                    } else ...{
+                                      sclButton(
+                                        context,
+                                        subjects[i],
+                                        color: Colors.grey,
+                                        () {
+                                          // Navigator.pushNamed(context, RouteManagerProvider.);
+                                        },
+                                      )
+                                    }
+                                  },
                                 ]
                               ]
                             ],
@@ -231,6 +256,7 @@ class _TeacherPState extends State<TeacherP> {
 
           // for( var group in teacher.groupNP)
           subjects = teacher.subjects!;
+          classesT = teacher.classes!;
 
           log("Mapped teacher: Name: ${teacher.name}, Email: ${teacher.emailAddress}, ID: ${teacher.id}");
           isLoading = false;

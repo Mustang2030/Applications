@@ -36,14 +36,22 @@ Teacher _$TeacherFromJson(Map<String, dynamic> json) => Teacher(
       teacherSchoolNP: json['teacherSchoolNP'] == null
           ? null
           : School.fromJson(json['teacherSchoolNP'] as Map<String, dynamic>),
-    )..attendanceRecords = (json['attendanceRecords'] as List<dynamic>?)
-        ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
-        .toList();
+      attendanceRecords: (json['attendanceRecords'] as List<dynamic>?)
+          ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      chats: (json['chats'] as List<dynamic>?)
+          ?.map((e) => Chat.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    )
+      ..profileImageBase64 = json['profileImageBase64'] as String?
+      ..profileImageType = json['profileImageType'] as String?;
 
 Map<String, dynamic> _$TeacherToJson(Teacher instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,
@@ -59,4 +67,5 @@ Map<String, dynamic> _$TeacherToJson(Teacher instance) => <String, dynamic>{
       'groupNP': instance.groupNP,
       'announcementNP': instance.announcementNP,
       'attendanceRecords': instance.attendanceRecords,
+      'chats': instance.chats,
     };

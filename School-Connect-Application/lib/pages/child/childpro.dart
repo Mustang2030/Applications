@@ -8,6 +8,7 @@ import 'package:scs/models/learner/learner.dart';
 import 'package:scs/models/learnerparent/learnerparent.dart';
 import 'package:scs/models/parent/parent.dart';
 import 'package:scs/models/school/school.dart';
+import 'package:scs/models/subgrade/subgrade.dart';
 import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
@@ -23,10 +24,11 @@ class _ChildProfileState extends State<ChildProfile> {
   late HttpService http;
   bool isLoading = false;
   Parent parent = Parent();
-  Learner learner = Learner(parents: []);
+  Learner learner = Learner();
   List<LearnerParent> learnerParent = [];
   School school = School();
   List<String> subjects = [];
+  SubGrade clas = SubGrade();
 
   @override
   void initState() {
@@ -63,7 +65,7 @@ class _ChildProfileState extends State<ChildProfile> {
                         size: 75,
                       ),
                       Text(
-                        "${learner.title} ${learner.name} ${learner.surname}",
+                        "${learner.name} ${learner.surname}",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w700),
                       ),
@@ -80,10 +82,24 @@ class _ChildProfileState extends State<ChildProfile> {
                             borderRadius: BorderRadius.circular(8)),
                         child: Column(
                           children: [
-                            // Place the loop here
+                            Text(
+                              "Class Teacher: ${clas.mainTeacher?.title}  ${clas.mainTeacher?.name}  ${clas.mainTeacher?.surname}",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white),
+                            ),
+                            Text(
+                              "Subjects: ",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white),
+                            ),
                             for (final sub in subjects) ...[
                               Text(
                                 sub,
+                                textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16),
                               )
@@ -97,14 +113,6 @@ class _ChildProfileState extends State<ChildProfile> {
                       rslButton(context, "ANNOUNCEMENTS", () {
                         Navigator.pushNamed(context,
                             RouteManagerProvider.parentViewListAnnouncemnt);
-                      }),
-                      rslButton(context, "REPORT CARD", () {
-                        Navigator.pushNamed(
-                            context, RouteManagerProvider.report);
-                      }),
-                      rslButton(context, "ATTENDANCE", () {
-                        Navigator.pushNamed(
-                            context, RouteManagerProvider.attendance);
                       }),
                     ],
                   ),
@@ -184,14 +192,9 @@ class _ChildProfileState extends State<ChildProfile> {
         setState(() {
           learner = Learner.fromJson(result);
 
-          // Set values to controllers after data is fetched
-          // nameController.text = parent.name ?? '';
-          // surnameController.text = parent.surname ?? '';
-          // emailController.text = parent.emailAddress ?? '';
-          // phoneController.text = parent.phoneNumber?.toString() ??
-          //     ''; // Handle null numbers
-          // subjects = learner.subjects!;
-          // Provide.of<LoginProvider>(context, listen: false).
+          clas = learner.clas!;
+
+          subjects = clas.subjectsTaught!;
           log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
           isLoading = false;
         });

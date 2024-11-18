@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
-// import 'package:image_picker/image_picker.dart';
 
 class HttpService {
   final Dio dio;

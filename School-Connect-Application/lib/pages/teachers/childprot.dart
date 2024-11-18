@@ -128,7 +128,6 @@ class _ChildProfileTState extends State<ChildProfileT> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildProfileRow("Title", "${learner.title}"),
             _buildProfileRow("Name", "${learner.name}"),
             _buildProfileRow("Surname", "${learner.surname}"),
             _buildProfileRow("Gender", "${learner.gender}"),
@@ -147,7 +146,7 @@ class _ChildProfileTState extends State<ChildProfileT> {
               ),
               _buildProfileRow("Parent Name(s)",
                   "${rent.parent!.name} ${rent.parent!.surname}"),
-              _buildProfileRow("Parent Type", "${rent.parent!.name}"),
+              _buildProfileRow("Parent Type", "${rent.parent!.parentType}"),
               _buildProfileRow(
                   "ParentPhone Number", "${rent.parent!.phoneNumber}"),
               _buildProfileRow(

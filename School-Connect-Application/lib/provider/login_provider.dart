@@ -12,6 +12,10 @@ class LoginProvider extends ChangeNotifier {
   String? _lerId;
   String? _maintId;
   String? _classes;
+  String? _tp;
+  String? _pt;
+  String? _scho;
+  String? _subroast;
 
   User? get user => _user;
   String? get token => _token;
@@ -22,6 +26,10 @@ class LoginProvider extends ChangeNotifier {
   String? get lerId => _lerId;
   String? get maintId => _maintId;
   String? get classes => _classes;
+  String? get tp => _tp;
+  String? get pt => _pt;
+  String? get scho => _scho;
+  String? get subroast => _subroast;
 
   bool get isLoggedIn => _user != null;
 
@@ -63,6 +71,26 @@ class LoginProvider extends ChangeNotifier {
 
   void classeslist(String classes) {
     _classes = classes;
+    notifyListeners();
+  }
+
+  void tpChat(String tp) {
+    _tp = tp;
+    notifyListeners();
+  }
+
+  void ptChat(String pt) {
+    _pt = pt;
+    notifyListeners();
+  }
+
+  void schoNa(String scho) {
+    _scho = scho;
+    notifyListeners();
+  }
+
+  void subjClaRoa(String subroast) {
+    _subroast = subroast;
     notifyListeners();
   }
 

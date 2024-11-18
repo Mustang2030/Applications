@@ -44,6 +44,8 @@ School _$SchoolFromJson(Map<String, dynamic> json) => School(
       attendanceRecords: (json['attendanceRecords'] as List<dynamic>?)
           ?.map((e) => Attendence.fromJson(e as Map<String, dynamic>))
           .toList(),
+      schoolLogoBase64: json['schoolLogoBase64'] as String?,
+      profileImageType: json['profileImageType'] as String?,
     );
 
 Map<String, dynamic> _$SchoolToJson(School instance) => <String, dynamic>{
@@ -55,6 +57,8 @@ Map<String, dynamic> _$SchoolToJson(School instance) => <String, dynamic>{
       'type': instance.type,
       'telePhoneNumber': instance.telephoneNumber,
       'emailAddress': instance.emailAddress,
+      'schoolLogoBase64': instance.schoolLogoBase64,
+      'profileImageType': instance.profileImageType,
       'systemAdminId': instance.systemAdminId,
       'schoolAddress': instance.schoolAddress,
       'schoolLearnersNP': instance.schoolLearnersNP,

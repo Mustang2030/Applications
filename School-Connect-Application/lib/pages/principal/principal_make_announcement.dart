@@ -197,19 +197,19 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
                 child: rslButton(context, "SEND", () {
                   setState(() {
                     announcement = Announcement(
-                      announcementId: 0,
-                      title: titleController.text,
-                      recipients: [selectedGroupNames],
-                      content: messageController.text,
-                      sendEmail: sendE,
-                      sendSMS: sendSms,
-                      scheduleForLater: scheduleAn,
-                      timeToPost: selectedDateAndTime,
-                      principalID: principal.id,
-                      teacherID: null,
-                      schoolID: principal.schoolID,
-                      dateCreated: DateTime.now(),
-                    );
+                        announcementId: 0,
+                        title: titleController.text,
+                        recipients: [selectedGroupNames],
+                        content: messageController.text,
+                        sendEmail: sendE,
+                        sendSMS: sendSms,
+                        scheduleForLater: scheduleAn,
+                        timeToPost: selectedDateAndTime,
+                        principalID: principal.id,
+                        teacherID: null,
+                        schoolID: principal.schoolID,
+                        dateCreated: DateTime.now(),
+                        viewedRecipients: [principal.staffNr.toString()]);
                   });
 
                   createAnnouncement();
@@ -227,7 +227,7 @@ class _PrincipalMakeAnnouncements extends State<PrincipalMakeAnnouncements> {
       log("Posting announcement");
       Response response = await http.postRequest(
         "${http.baseUrl}Announcement/Create",
-        announcement.toJson(),
+        announcement,
       );
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         log("Announcement made");

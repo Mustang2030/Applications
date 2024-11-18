@@ -73,7 +73,8 @@ Container slButton(BuildContext context, String isLogin, Function onTap) {
 }
 
 //School Button
-Container sclButton(BuildContext context, String isLogin, VoidCallback onTap) {
+Container sclButton(BuildContext context, String isLogin, VoidCallback onTap,
+    {Color? color}) {
   return Container(
     width: MediaQuery.of(context).size.width,
     height: 50,
@@ -88,7 +89,7 @@ Container sclButton(BuildContext context, String isLogin, VoidCallback onTap) {
           if (states.contains(WidgetState.pressed)) {
             return Colors.black; // Color when pressed
           }
-          return const Color.fromARGB(255, 110, 109, 109); // Default color
+          return color ?? const Color(0xFF0F2E34);
         }),
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
@@ -687,16 +688,14 @@ class AnnouncementTile extends StatelessWidget {
   final bool pending;
   final bool seen;
   final IconButton? delIcon;
-  final IconButton? editIcon;
 
   const AnnouncementTile({
     super.key,
     required this.from,
     required this.message,
     this.pending = false,
-    this.seen = false,
+    required this.seen,
     this.delIcon,
-    this.editIcon,
   });
 
   @override
@@ -747,7 +746,6 @@ class AnnouncementTile extends StatelessWidget {
           IconButtonsRow(
             pending: pending,
             delIcon: delIcon,
-            editIcon: editIcon,
           ),
         ],
       ),

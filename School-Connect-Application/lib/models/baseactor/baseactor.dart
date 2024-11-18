@@ -14,6 +14,12 @@ class BaseActor {
   @JsonKey(name: "profileImage")
   String? profileImage;
 
+  @JsonKey(name: "profileImageBase64")
+  String? profileImageBase64;
+
+  @JsonKey(name: "profileImageType")
+  String? profileImageType;
+
   @JsonKey(
       name: "profileImageFile", includeToJson: false, includeFromJson: false)
   MultipartFile? profileImageFile;
@@ -40,6 +46,8 @@ class BaseActor {
     this.role,
     this.title,
     this.profileImageFile,
+    this.profileImageBase64,
+    this.profileImageType,
   });
 
   factory BaseActor.fromJson(Map<String, dynamic> json) =>

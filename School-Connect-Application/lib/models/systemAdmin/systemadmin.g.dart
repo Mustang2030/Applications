@@ -20,13 +20,17 @@ SystemAdmin _$SystemAdminFromJson(Map<String, dynamic> json) => SystemAdmin(
       sysAdminSchoolNP: json['sysAdminSchoolNP'] == null
           ? null
           : School.fromJson(json['sysAdminSchoolNP'] as Map<String, dynamic>),
-    );
+    )
+      ..profileImageBase64 = json['profileImageBase64'] as String?
+      ..profileImageType = json['profileImageType'] as String?;
 
 Map<String, dynamic> _$SystemAdminToJson(SystemAdmin instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,

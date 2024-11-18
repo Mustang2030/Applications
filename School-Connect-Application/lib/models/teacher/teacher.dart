@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:scs/models/chat/chat.dart';
 import 'package:scs/models/announcement/announcement.dart';
 import 'package:scs/models/attendence/attendence.dart';
 import 'package:scs/models/baseactor/baseactor.dart';
@@ -44,7 +45,10 @@ class Teacher extends BaseActor {
   List<Announcement>? announcementNP;
 
   @JsonKey(name: "attendanceRecords")
-  List<Attendence>? attendanceRecords; //One to one
+  List<Attendence>? attendanceRecords;
+
+  @JsonKey(name: "chats")
+  List<Chat>? chats;
 
   Teacher({
     super.id,
@@ -64,6 +68,8 @@ class Teacher extends BaseActor {
     this.announcementNP,
     this.groupNP,
     this.teacherSchoolNP,
+    this.attendanceRecords,
+    this.chats,
   });
 
   factory Teacher.fromJson(Map<String, dynamic> json) =>

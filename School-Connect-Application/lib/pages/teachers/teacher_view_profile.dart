@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -101,8 +102,15 @@ class _TeacherDetailsState extends State<TeacherDetails> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 70, color: Color(0xFF0F2E34)),
+              backgroundImage: teacher.profileImageBase64 != null
+                  ? MemoryImage(base64Decode(teacher.profileImageBase64!))
+                  : null,
+              child: teacher.profileImageBase64 == null
+                  ? Icon(
+                      Icons.person,
+                      size: 55,
+                    )
+                  : null,
             ),
             SizedBox(height: 16),
             Text(

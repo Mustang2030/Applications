@@ -1,5 +1,13 @@
+import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:scs/models/grade/grade.dart';
+import 'package:scs/models/parent/parent.dart';
+import 'package:scs/models/teacher/teacher.dart';
+import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
+import 'package:scs/services/http_service.dart';
 
 class SubjectT extends StatefulWidget {
   const SubjectT({super.key});
@@ -9,20 +17,28 @@ class SubjectT extends StatefulWidget {
 }
 
 class _SubjectTState extends State<SubjectT> {
+  late HttpService http;
+
+  @override
+  void initState() {
+    http = HttpService();
+    getTeacher();
+    super.initState();
+  }
+
+  Teacher teacher = Teacher();
+  Parent parent = Parent();
+  List<Grade> grades = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back)),
-        // actions: const [
-        //   DrawerButton(
-        //     color: Color.fromRGBO(0, 0, 0, 1),
-        //   ),
-        // ],
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -123,5 +139,23 @@ class _SubjectTState extends State<SubjectT> {
         ),
       ),
     );
+  }
+
+  Future<void> getTeacher() async {
+    String? token = Provider.of<LoginProvider>(context, listen: false).token;
+
+    try {
+      Response response =
+          await http.getRequest("Teacher/GetGradesByTeacher?teacherId=$token");
+
+      if (response.data["Success"] == true) {
+        var result = response.data["Result"];
+        setState(() {
+          grades = List<Grade>.from(result.map((json) => Grade.fromJson(json)));
+        });
+      }
+    } catch (e) {
+      log("Error here: $e");
+    }
   }
 }

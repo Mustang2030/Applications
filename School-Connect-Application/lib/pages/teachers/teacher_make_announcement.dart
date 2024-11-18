@@ -205,22 +205,22 @@ class _TeacherMakeSchoolAnnouncementPage
                   padding: const EdgeInsets.fromLTRB(120, 0, 120, 0),
                   child: rslButton(context, "SEND", () {
                     setState(() {
-                      //Come back for viewed Recipients
-
                       announcement = Announcement(
-                        announcementId: 0,
-                        title: titleController.text,
-                        recipients: [selectedGroupNames],
-                        content: messageController.text,
-                        sendEmail: sendE,
-                        sendSMS: sendSms,
-                        scheduleForLater: scheduleAn,
-                        timeToPost: selectedDateAndTime,
-                        principalID: null,
-                        teacherID: teacher.id,
-                        schoolID: teacher.schoolID,
-                        dateCreated: DateTime.now(),
-                      );
+                          announcementId: 0,
+                          title: titleController.text,
+                          recipients: [selectedGroupNames],
+                          content: messageController.text,
+                          sendEmail: sendE,
+                          sendSMS: sendSms,
+                          scheduleForLater: scheduleAn,
+                          timeToPost: selectedDateAndTime,
+                          principalID: null,
+                          teacherID: teacher.id,
+                          schoolID: teacher.schoolID,
+                          dateCreated: DateTime.now(),
+                          viewedRecipients: [
+                            teacher.staffNr.toString(),
+                          ]);
                     });
 
                     createAnnouncement();
@@ -239,7 +239,7 @@ class _TeacherMakeSchoolAnnouncementPage
       log("Posting announcement");
       Response response = await http.postRequest(
         "${http.baseUrl}Announcement/Create",
-        announcement.toJson(),
+        announcement,
       );
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         log("Announcement made");

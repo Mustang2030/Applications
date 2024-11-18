@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -92,8 +93,15 @@ class _PrincipalProfileViewState extends State<PrincipalProfileView> {
             // Image.asset(principal.profileImage!),
             CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 70, color: Color(0xFF0F2E34)),
+              backgroundImage: principal.profileImageBase64 != null
+                  ? MemoryImage(base64Decode(principal.profileImageBase64!))
+                  : null,
+              child: principal.profileImageBase64 == null
+                  ? Icon(
+                      Icons.person,
+                      size: 55,
+                    )
+                  : null,
             ),
             SizedBox(height: 16),
             Text(

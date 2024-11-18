@@ -80,44 +80,38 @@ TableRow tableMeInfo(
 }
 
 TableRow tableMeInfoT(
-    String? name, String? name2, List<bool> isSelected, Function()? onTap) {
+    String? name, String? name2, bool isSelected, VoidCallback pressed) {
   return TableRow(
     decoration: BoxDecoration(
       border: Border.all(),
     ),
     children: [
       Padding(
-        padding: const EdgeInsets.all(3),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              "$name",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-            ),
+        padding: const EdgeInsets.all(0),
+        child: Center(
+          child: Text(
+            "$name",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
           ),
         ),
       ),
       Padding(
-        padding: const EdgeInsets.all(3),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              "$name2",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-            ),
+        padding: const EdgeInsets.all(0),
+        child: Center(
+          child: Text(
+            "$name2",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
           ),
         ),
       ),
       Padding(
-        padding: const EdgeInsets.all(3),
+        padding: const EdgeInsets.all(0),
         child: GestureDetector(
-          onTap: onTap,
+          onTap: pressed,
           child: Center(
             child: Icon(
-              isSelected.first ? Icons.check : Icons.close,
-              color: isSelected.first ? Colors.green : Colors.red,
+              isSelected ? Icons.check : Icons.close,
+              color: isSelected ? Colors.green : Colors.red,
             ),
           ),
         ),

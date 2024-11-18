@@ -97,14 +97,12 @@ class _TeacherViewListAnnouncementsPageState
                                 // The commented one is to be used when NP are set
                                 "${announcement.title}",
                             message: announcement.content ?? "No content",
-                            seen: false,
-                            pending: announcement.teacherID != null
+                            seen: announcement.viewedRecipients!
+                                    .contains(teacher.staffNr.toString())
                                 ? true
-                                : false, // You can manage the pending logic here
-                            editIcon: IconButton(
-                                color: Colors.green,
-                                onPressed: () {},
-                                icon: Icon(Icons.edit)),
+                                : false,
+                            pending:
+                                announcement.teacherID != null ? true : false,
                             delIcon: IconButton(
                                 color: Colors.red,
                                 onPressed: () {

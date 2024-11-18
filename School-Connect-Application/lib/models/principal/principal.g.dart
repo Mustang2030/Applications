@@ -25,12 +25,16 @@ Principal _$PrincipalFromJson(Map<String, dynamic> json) => Principal(
           ? null
           : Announcement.fromJson(
               json['announcementsNP'] as Map<String, dynamic>),
-    );
+    )
+      ..profileImageBase64 = json['profileImageBase64'] as String?
+      ..profileImageType = json['profileImageType'] as String?;
 
 Map<String, dynamic> _$PrincipalToJson(Principal instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,

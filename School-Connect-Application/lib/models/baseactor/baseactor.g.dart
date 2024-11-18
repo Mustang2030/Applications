@@ -14,12 +14,16 @@ BaseActor _$BaseActorFromJson(Map<String, dynamic> json) => BaseActor(
       gender: json['gender'] as String?,
       role: json['role'] as String?,
       title: json['title'] as String?,
+      profileImageBase64: json['profileImageBase64'] as String?,
+      profileImageType: json['profileImageType'] as String?,
     );
 
 Map<String, dynamic> _$BaseActorToJson(BaseActor instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,

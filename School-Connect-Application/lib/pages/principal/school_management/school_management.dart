@@ -83,12 +83,7 @@ class _SchoolManagementState extends State<SchoolManagement> {
                     const SizedBox(height: 50),
                     _buildButton(context, 'Manage Teacher Class Assignment',
                         RouteManagerProvider.principalAssignTeacherToClass),
-                    const SizedBox(height: 30),
-                    _buildButton(context, 'Manage Announcement Groups',
-                        RouteManagerProvider.principalListAnnounce),
-                    const SizedBox(height: 30),
-                    _buildButton(context, 'Manage School',
-                        RouteManagerProvider.principalListAnnounce),
+
                     const SizedBox(height: 30),
                     _buildButton(context, 'Manage Grades',
                         RouteManagerProvider.manageGrades),

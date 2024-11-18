@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,20 +11,20 @@ import 'package:scs/provider/login_provider.dart';
 import 'package:scs/routes/routes.dart';
 import 'package:scs/services/http_service.dart';
 
-class TeacherClassRoaster extends StatefulWidget {
-  const TeacherClassRoaster({super.key});
+class SubjClassRoaster extends StatefulWidget {
+  const SubjClassRoaster({super.key});
 
   @override
-  State<TeacherClassRoaster> createState() => _TeacherClassRoasterState();
+  State<SubjClassRoaster> createState() => _SubjClassRoasterState();
 }
 
-class _TeacherClassRoasterState extends State<TeacherClassRoaster> {
+class _SubjClassRoasterState extends State<SubjClassRoaster> {
   late HttpService http;
 
   @override
   void initState() {
     http = HttpService();
-    getLearners("Learner/GetLearnersByClass?teacherId=");
+    getLearners("Learner/GetLearnersByClassID?classId=");
     super.initState();
   }
 
@@ -101,10 +102,6 @@ class _TeacherClassRoasterState extends State<TeacherClassRoaster> {
                         ),
                       ),
                     ),
-                    rslButton(context, "MARK ATTENDENCE", () {
-                      Navigator.pushNamed(
-                          context, RouteManagerProvider.mattendence);
-                    }),
                     Padding(
                       padding: const EdgeInsets.only(left: 350, top: 400),
                       child: FloatingActionButton(
@@ -129,13 +126,14 @@ class _TeacherClassRoasterState extends State<TeacherClassRoaster> {
   }
 
   Future<void> getLearners(String? url) async {
-    String? token = Provider.of<LoginProvider>(context, listen: false).token;
+    String? subroast =
+        Provider.of<LoginProvider>(context, listen: false).subroast;
 
     try {
       setState(() {
         isLoading = false;
       });
-      Response response = await http.getRequest("${http.baseUrl}$url$token");
+      Response response = await http.getRequest("${http.baseUrl}$url$subroast");
 
       if (response.data['Success'] == true) {
         var result = response.data["Result"];

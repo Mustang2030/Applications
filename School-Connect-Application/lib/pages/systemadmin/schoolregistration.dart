@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
+import 'package:scs/misc/validators.dart';
 import 'package:scs/models/school/address.dart';
 import 'package:scs/models/school/school.dart';
 import 'package:scs/models/systemAdmin/systemadmin.dart';
@@ -34,6 +35,8 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
   final TextEditingController provinceController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController telephone = TextEditingController();
+
+  final _formkey = GlobalKey();
 
   bool isLoading = false;
   late HttpService http;
@@ -76,155 +79,161 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
           padding: const EdgeInsets.all(8.0),
           child: Container(
             decoration: const BoxDecoration(color: Colors.white),
-            child: Column(
-              children: [
-                Text(
-                  "${systemAdmin.name} ${systemAdmin.surname}",
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F2E34)),
-                ),
-                const Icon(
-                  Icons.vertical_shades_closed_outlined,
-                  size: 100,
-                  color: Color(0xFF0F2E34),
-                ),
-                const Text(
-                  "Please enter the school's information here",
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F2E34)),
-                ),
-                const SizedBox(height: 20),
-                StyledFormField(
-                  controller: emisNumber,
-                  decoration: formS("EMIS Number",
-                      "Please enter the school's EMIS number.", Icons.numbers,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
-                // Display selected image preview
-                if (_selectedImage != null)
-                  Image.file(
-                    _selectedImage!,
-                    height: 150,
-                    width: 150,
-                    fit: BoxFit.cover,
+            child: Form(
+              key: _formkey,
+              child: Column(
+                children: [
+                  Text(
+                    "${systemAdmin.name} ${systemAdmin.surname}",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F2E34)),
                   ),
-                rslButton(context, "School Logo", () {
-                  pickImage();
-                }),
-                StyledFormField(
-                  keyboardType: TextInputType.name,
-                  controller: schoolName,
-                  decoration: formS("School Name",
-                      "What's the name of your school?", Icons.school,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Address Fields",
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F2E34)),
-                ),
+                  const Icon(
+                    Icons.vertical_shades_closed_outlined,
+                    size: 100,
+                    color: Color(0xFF0F2E34),
+                  ),
+                  const Text(
+                    "Please enter the school's information here",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F2E34)),
+                  ),
+                  const SizedBox(height: 20),
+                  StyledFormField(
+                    controller: emisNumber,
+                    validator: emis,
+                    decoration: formS("EMIS Number",
+                        "Please enter the school's EMIS number.", Icons.numbers,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
+                  // Display selected image preview
+                  if (_selectedImage != null)
+                    Image.file(
+                      _selectedImage!,
+                      height: 150,
+                      width: 150,
+                      fit: BoxFit.cover,
+                    ),
+                  rslButton(context, "School Logo", () {
+                    pickImage();
+                  }),
+                  StyledFormField(
+                    keyboardType: TextInputType.name,
+                    controller: schoolName,
+                    decoration: formS("School Name",
+                        "What's the name of your school?", Icons.school,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Address Fields",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F2E34)),
+                  ),
 
-                StyledFormField(
-                  controller: streetController,
-                  decoration: formS("Street", "Enter registration date",
-                      Icons.location_on_outlined,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
+                  StyledFormField(
+                    controller: streetController,
+                    decoration: formS("Street", "Enter registration date",
+                        Icons.location_on_outlined,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
 
-                StyledFormField(
-                  controller: cityController,
-                  decoration: formS(
-                      "City", "Enter registration date", Icons.location_city,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
+                  StyledFormField(
+                    controller: cityController,
+                    decoration: formS(
+                        "City", "Enter registration date", Icons.location_city,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
 
-                StyledFormField(
-                  controller: suburbController,
-                  decoration: formS("Suburb", "Enter registration date",
-                      Icons.location_city_sharp,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
-                StyledFormField(
-                  controller: postalCodeController,
-                  decoration: formS("Postal Code", "Enter registration date",
-                      Icons.location_on_outlined,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
-                StyledFormField(
-                  controller: provinceController,
-                  isDropdown: true,
-                  selectedItem: selectedProvince,
-                  dropdownItems: const [
-                    'Gauteng',
-                    'Free State',
-                    'North West',
-                    'Eastern Cape',
-                    'Limpopo',
-                    'Kwa-Zulu Natal',
-                    'Western Cape',
-                  ],
-                  decoration: formS("Province", "Enter registration date",
-                      Icons.location_on_outlined,
-                      iconColor: const Color(0xFF0F2E34)),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedProvince = value;
-                      address.province =
-                          selectedProvince; // Set province in the model
-                    });
-                  },
-                ),
-                StyledFormField(
-                  controller: telephone,
-                  decoration: formS(
-                      "Telephone", "Enter school telephone number", Icons.phone,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
-                StyledFormField(
-                  controller: emailController,
-                  decoration: formS("Email", "Enter school email", Icons.email,
-                      iconColor: const Color(0xFF0F2E34)),
-                ),
-                // Dropdown for School Type
-                StyledFormField(
-                  isDropdown: true,
-                  selectedItem: selectedSchoolType,
-                  dropdownItems: const ["Primary", "High", "Combined"],
-                  decoration: formS("School Type", "", Icons.school,
-                      iconColor: const Color(0xFF0F2E34)),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSchoolType = value;
-                      school.type =
-                          selectedSchoolType; // Set school type in the model
-                    });
-                  },
-                ),
+                  StyledFormField(
+                    controller: suburbController,
+                    decoration: formS("Suburb", "Enter registration date",
+                        Icons.location_city_sharp,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
+                  StyledFormField(
+                    controller: postalCodeController,
+                    decoration: formS("Postal Code", "Enter registration date",
+                        Icons.location_on_outlined,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
+                  StyledFormField(
+                    controller: provinceController,
+                    isDropdown: true,
+                    selectedItem: selectedProvince,
+                    dropdownItems: const [
+                      'Gauteng',
+                      'Free State',
+                      'North West',
+                      'Eastern Cape',
+                      'Limpopo',
+                      'Kwa-Zulu Natal',
+                      'Western Cape',
+                    ],
+                    decoration: formS("Province", "Enter registration date",
+                        Icons.location_on_outlined,
+                        iconColor: const Color(0xFF0F2E34)),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedProvince = value;
+                        address.province =
+                            selectedProvince; // Set province in the model
+                      });
+                    },
+                  ),
+                  StyledFormField(
+                    controller: telephone,
+                    decoration: formS("Telephone",
+                        "Enter school telephone number", Icons.phone,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
+                  StyledFormField(
+                    controller: emailController,
+                    decoration: formS(
+                        "Email", "Enter school email", Icons.email,
+                        iconColor: const Color(0xFF0F2E34)),
+                  ),
+                  // Dropdown for School Type
+                  StyledFormField(
+                    isDropdown: true,
+                    selectedItem: selectedSchoolType,
+                    dropdownItems: const ["Primary", "High", "Combined"],
+                    decoration: formS("School Type", "", Icons.school,
+                        iconColor: const Color(0xFF0F2E34)),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSchoolType = value;
+                        school.type =
+                            selectedSchoolType; // Set school type in the model
+                      });
+                    },
+                  ),
 
-                Text(
-                  errorMessage,
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                ),
-                rslButton(
-                  context,
-                  isLoading ? "Processing..." : "REGISTER",
-                  isLoading
-                      ? () {}
-                      : () {
-                          registerSchool();
-                        },
-                ),
-              ],
+                  Text(
+                    errorMessage,
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  rslButton(
+                    context,
+                    isLoading ? "Processing..." : "REGISTER",
+                    isLoading
+                        ? () {}
+                        : () {
+                            // if(_formkey!)
+                            registerSchool();
+                          },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -271,7 +280,11 @@ class _SchoolRegistrationState extends State<SchoolRegistration> {
 
   bool validateFields() {
     // Add your validation logic here
-    if (emisNumber.text.isEmpty || schoolName.text.isEmpty) {
+    if (emisNumber.text.isEmpty ||
+        schoolName.text.isEmpty ||
+        cityController.text.isEmpty ||
+        postalCodeController.text.isEmpty ||
+        selectedProvince.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             backgroundColor: Colors.red,

@@ -19,17 +19,13 @@ class MarkAttendance extends StatefulWidget {
 }
 
 class _MarkAttendanceState extends State<MarkAttendance> {
+  List<bool> presMarks = [];
+
   bool isLoading = false;
   DateTime nowdate = DateTime.now();
-  bool presMark = false;
 
-  // TeachMkAttendance? attendenceRecord;
-  // List<TeachMkAttendance> attendenceRecordsss = [];
   Teacher teacher = Teacher();
   List<Learner> learners = [];
-  Learner learner = Learner();
-  // SubGrade mainCl = SubGrade();
-  Attendence? attendenceRecord;
   List<Attendence> attendenceRecords = [];
   late HttpService http;
 
@@ -40,13 +36,16 @@ class _MarkAttendanceState extends State<MarkAttendance> {
     super.initState();
   }
 
+  void markAtt() {
+    setState(() {
+      presMarks = List<bool>.filled(learners.length, false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<bool> attend = List.filled(learners.length - 1, false);
-
-    void toggleRowState(int rowIndex) {
-      attend[rowIndex] = !attend[rowIndex];
-    }
+    // Initialize the presMarks list to match the learners list length
+    presMarks = List<bool>.filled(learners.length, false);
 
     return Scaffold(
       appBar: AppBar(
@@ -75,7 +74,7 @@ class _MarkAttendanceState extends State<MarkAttendance> {
               child: Column(
                 children: [
                   Text(
-                      "Mark Learner Attendence: ${teacher.mainClass?.classDesignate}",
+                      "Mark Learner Attendance: ${teacher.mainClass?.classDesignate}",
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -86,36 +85,37 @@ class _MarkAttendanceState extends State<MarkAttendance> {
                       tableMe("Name", "Surname",
                           "${nowdate.day}/${nowdate.month}/${nowdate.year}"),
                       if (learners.isNotEmpty) ...{
-                        for (learner in learners) ...[
+                        for (int i = 0; i < learners.length; i++)
                           tableMeInfoT(
-                              "${learner.name}", "${learner.surname}", attend,
-                              () {
-                            toggleRowState(2);
-                          })
-                        ]
+                            learners[i].name,
+                            learners[i].surname,
+                            presMarks[i],
+                            () {
+                              markAtt();
+                              presMarks[i] = !presMarks[i];
+
+                              log("These are the statuses: ${presMarks.toList()}");
+                            },
+                          ),
                       },
                     ],
                   ),
                   SizedBox(height: 20),
                   rslButton(context, "Submit", () {
-                    for (learner in learners) {
-                      setState(() {
-                        attendenceRecords = [
-                          for (int i = 0; i <= learners.length - 1; i++) ...{
-                            attendenceRecord = Attendence(
-                              attendenceId: 0,
-                              classId: teacher.mainClass!.id,
-                              date: nowdate,
-                              learnerId: learners[i].id,
-                              schoolId: teacher.schoolID,
-                              status: presMark,
-                              teacherId: teacher.id,
-                            )
-                          },
-                        ];
-                      });
-                    }
-                    markAttendence();
+                    // Populate attendance records based on presMarks status
+                    attendenceRecords = [
+                      for (int i = 0; i < learners.length; i++)
+                        Attendence(
+                          attendenceId: 0,
+                          classId: teacher.mainClass!.id,
+                          date: nowdate,
+                          learnerId: learners[i].id,
+                          schoolId: teacher.schoolID,
+                          status: presMarks[i],
+                          teacherId: teacher.id,
+                        ),
+                    ];
+                    markAttendance();
                   })
                 ],
               ),
@@ -133,25 +133,27 @@ class _MarkAttendanceState extends State<MarkAttendance> {
         var result = response.data["Result"];
         setState(() {
           teacher = Teacher.fromJson(result);
-
-          learners = teacher.mainClass!.learners!;
-          // attendenceRecords = List<Attendence>.from(
-          //     result.map((json) => Attendence.fromJson(json)));
-
-          // learners = List<Learner>.from(teacher.mainClass!.learners!
-          //     .map((json) => Learner.fromJson(learner.toJson())));
+          learners = teacher.mainClass?.learners ?? [];
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      // Handle error
+    }
   }
 
-  Future<void> markAttendence() async {
+  Future<void> markAttendance() async {
     try {
       Response response =
           await http.putRequest("Teacher/MarkAttendance", attendenceRecords);
 
       if (response.data["Success"] == true) {
-        log("Submited attendence");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Submitted attendance"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        log("Submitted attendance");
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

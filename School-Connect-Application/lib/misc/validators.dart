@@ -22,6 +22,13 @@ String? validatePassword(String? value) {
   return null;
 }
 
+String? emis(String? value) {
+  if (value == 8) {
+    return "Emis Number is supposed to have 8 characters";
+  }
+  return null;
+}
+
 String? validateCap(String? value) {
   if (value == null || value.isEmpty) {
     return "Please don't leave this empty";

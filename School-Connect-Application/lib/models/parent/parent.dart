@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:scs/models/chat/chat.dart';
 import 'package:scs/models/baseactor/baseactor.dart';
 import 'package:scs/models/groupactor/groupactors.dart';
 import 'package:scs/models/learnerparent/learnerparent.dart';
@@ -26,6 +27,9 @@ class Parent extends BaseActor {
   @JsonKey(name: "groupNP")
   List<GroupActors>? groupNP;
 
+  @JsonKey(name: "chats")
+  List<Chat>? chats;
+
   Parent({
     super.id,
     super.profileImage,
@@ -41,6 +45,7 @@ class Parent extends BaseActor {
     this.phoneNumber,
     this.children,
     this.groupNP,
+    this.chats,
   });
 
   factory Parent.fromJson(Map<String, dynamic> json) => _$ParentFromJson(json);

@@ -97,12 +97,12 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
                                 // The commented one is to be used when NP are set
                                 "${announcement.title}",
                             message: announcement.content ?? "No content",
-                            seen: false,
+                            seen: announcement.viewedRecipients!
+                                .contains(parent.id.toString()),
                             pending: principal.id != null
                                 ? true
                                 : false, // You can manage the pending logic here
-                            editIcon: IconButton(
-                                onPressed: () {}, icon: Icon(Icons.edit)),
+
                             delIcon: IconButton(
                                 onPressed: () {}, icon: Icon(Icons.delete)),
                           ),

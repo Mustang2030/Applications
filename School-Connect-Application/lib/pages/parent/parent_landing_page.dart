@@ -26,7 +26,6 @@ class _ParentPageState extends State<ParentPage> {
   Learner learner = Learner(subjects: []);
   School school = School();
   List<LearnerParent> learners = [];
-  List<LearnerParent> parents = [];
 
   List<School> schools = [];
 
@@ -39,21 +38,7 @@ class _ParentPageState extends State<ParentPage> {
 
   @override
   Widget build(BuildContext context) {
-    // String? token = Provider.of<LoginProvider>(context, listen: false).token;
-
     return Scaffold(
-      // appBar: AppBar(
-      //   leading: IconButton(
-      //     onPressed: () {
-      //       Navigator.pop(context);
-      //     },
-      //     icon: const Icon(
-      //       Icons.arrow_back,
-      //       color: kTextColor,
-      //     ),
-      //   ),
-      //   backgroundColor: const Color(0xFF0F2E34),
-      // ),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(),
@@ -107,8 +92,16 @@ class _ParentPageState extends State<ParentPage> {
                                       itemCount: schools.length,
                                       itemBuilder: (context, index) {
                                         final school = schools[index];
+
                                         return MaterialButton(
                                           onPressed: () {
+                                            String? scho =
+                                                schools[index].id.toString();
+
+                                            Provider.of<LoginProvider>(context,
+                                                    listen: false)
+                                                .schoNa(scho);
+
                                             Navigator.pushNamed(
                                                 context,
                                                 RouteManagerProvider
@@ -185,20 +178,15 @@ class _ParentPageState extends State<ParentPage> {
           var result = response.data['Result'];
           setState(() {
             parent = Parent.fromJson(result);
+
             //Modifications for today
-            // learners = List<LearnerParent>.from(
-            //     result.map((json) => LearnerParent.fromJson(json)));
-            learner = Learner.fromJson(result);
-            // parents = List<LearnerParent>.from(
-            //     result.map((json) => LearnerParent.fromJson(json)));
+            learners = parent.children!;
 
             log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
             isLoading = false;
           });
         }
-        getSchools("School/GetSchoolById?schoolId=");
-
-        // getLearner("Learner/GetLearnerById?id=");
+        await getSchools("School/GetSchoolById?schoolId=");
       } else {
         log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
         setState(() {
@@ -217,8 +205,12 @@ class _ParentPageState extends State<ParentPage> {
   Future<void> getSchools(String url) async {
     String? token = Provider.of<LoginProvider>(context, listen: false).token;
 
+    for (int i = 0; i <= learners.length - 1; i++) {
+      learner = learners[i].learner!;
+    }
+
     // token = learner.schoolID.toString();
-    token = parent.children!.first.learner!.schoolID.toString();
+    token = learner.schoolID.toString();
     // token = learner.schoolID.toString();
 
     setState(() {
@@ -283,6 +275,7 @@ class _ParentPageState extends State<ParentPage> {
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            backgroundColor: Colors.red,
             content: Text("Logged out"),
           ),
         );

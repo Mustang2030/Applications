@@ -24,12 +24,19 @@ Parent _$ParentFromJson(Map<String, dynamic> json) => Parent(
       groupNP: (json['groupNP'] as List<dynamic>?)
           ?.map((e) => GroupActors.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+      chats: (json['chats'] as List<dynamic>?)
+          ?.map((e) => Chat.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    )
+      ..profileImageBase64 = json['profileImageBase64'] as String?
+      ..profileImageType = json['profileImageType'] as String?;
 
 Map<String, dynamic> _$ParentToJson(Parent instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,
@@ -40,4 +47,5 @@ Map<String, dynamic> _$ParentToJson(Parent instance) => <String, dynamic>{
       'phoneNumber': instance.phoneNumber,
       'children': instance.children,
       'groupNP': instance.groupNP,
+      'chats': instance.chats,
     };

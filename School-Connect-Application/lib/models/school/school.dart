@@ -40,27 +40,15 @@ class School {
   @JsonKey(name: "emailAddress")
   String? emailAddress;
 
+  @JsonKey(name: "schoolLogoBase64")
+  String? schoolLogoBase64;
+
+  @JsonKey(name: "profileImageType")
+  String? profileImageType;
+
   //Foreign Keys
   @JsonKey(name: "systemAdminId")
   int? systemAdminId;
-
-  // School.all([
-  //   this.id,
-  //   this.emisNumber,
-  //   this.logo,
-  //   this.name,
-  //   this.dateregistered,
-  //   this.type,
-  //   //Verify if these should be nullable
-  //   this.systemAdminId,
-  //   this.schoolAddress,
-  //   this.schoolLearnersNP,
-  //   this.schoolPrincipalNP,
-  //   this.schoolTeachersNP,
-  //   this.schoolAnnouncementNP,
-  //   this.schoolGroupsNP,
-  //   this.schoolSysAdminNP,
-  // ]);
 
   School({
     this.id,
@@ -82,6 +70,8 @@ class School {
     this.schoolSysAdminNP,
     this.schoolLogoFile,
     this.attendanceRecords,
+    this.schoolLogoBase64,
+    this.profileImageType,
   });
 
   //Navigation Properties or Relationships
@@ -112,88 +102,4 @@ class School {
   factory School.fromJson(Map<String, dynamic> json) => _$SchoolFromJson(json);
 
   Map<String, dynamic> toJson() => _$SchoolToJson(this);
-
-  // Map<String, dynamic> toJson() => {
-  //       'id': id,
-  //       'emisNo': emisNo,
-  //       'logo': logo,
-  //       'name': name,
-  //       'dateregistered': dateregistered,
-  //       'type': type,
-  //       'systemAdminId': systemAdminId,
-  //       'schoolAddress': schoolAddress,
-  //       'schoolLearnersNP': schoolLearnersNP,
-  //       'schoolPrincipalNP': schoolPrincipalNP,
-  //       'schoolTeachersNP': schoolTeachersNP,
-  //     };
-
-  // factory School.fromJson(Map<String, dynamic> json) {
-  //   return School(
-  //       id: json['id'],
-  //       emisNo: json['emisNo'],
-  //       logo: json['logo'],
-  //       name: json['name'],
-  //       dateregistered: DateTime.parse(json['dateRegistered']),
-  //       type: json['type'],
-  //       systemAdminId: json['systemAdminId'],
-  //       schoolAddress: json['address'],
-  //       schoolLearnersNP: json['schoolLearnersNP'],
-  //       schoolPrincipalNP: json['schoolPrincipal'],
-  //       schoolTeachersNP: json['schoolTeachersNP']);
-  // }
-
-  // int get id => _id;
-  // set id(int value) {
-  //   _id = value;
-  // }
-
-  // int get emisNo => _emisNo;
-  // set emisNo(int value) {
-  //   _emisNo = value;
-  // }
-
-  // String get logo => _logo;
-  // set logo(String value) {
-  //   _logo = value;
-  // }
-
-  // String get name => _name;
-  // set name(String value) {
-  //   _name = value;
-  // }
-
-  // DateTime get dateregistered => _dateregistered;
-  // set dateRegistered(DateTime value) {
-  //   _dateregistered = value;
-  // }
-
-  // String get type => _type;
-  // set type(String value) {
-  //   _type = value;
-  // }
-
-  // int get systemAdminId => _systemAdminId;
-  // set systemAdminId(int value) {
-  //   _systemAdminId = value;
-  // }
-
-  // Address get schoolAddress => _schoolAddress;
-  // set schoolAddress(Address value) {
-  //   schoolAddress = value;
-  // }
-
-  // List<Learner> get schoolLearnersNP => _schoolLearnersNP;
-  // set schoolLearnersNP(List<Learner> value) {
-  //   _schoolLearnersNP = value;
-  // }
-
-  // List<Teacher> get schoolTeachersNP => _schoolTeachersNP;
-  // set schoolTeachersNP(List<Teacher> value) {
-  //   _schoolTeachersNP = value;
-  // }
-
-  // Principal get schoolPricipalNP => _schoolPrincipalNP;
-  // set schoolPrincipalNP(Principal value) {
-  //   _schoolPrincipalNP = value;
-  // }
 }

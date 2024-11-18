@@ -99,14 +99,12 @@ class _PrincipalListAnnouncementsPageState
                                 // The commented one is to be used when NP are set
                                 "${announcement.title}",
                             message: announcement.content ?? "No content",
-                            seen: false,
-                            pending: announcement.principalID != null
+                            seen: announcement.viewedRecipients!
+                                    .contains(principal.id.toString())
                                 ? true
-                                : false, // You can manage the pending logic here
-                            editIcon: IconButton(
-                                color: Colors.green,
-                                onPressed: () {},
-                                icon: Icon(Icons.edit)),
+                                : false,
+                            pending:
+                                announcement.principalID != null ? true : false,
                             delIcon: IconButton(
                                 color: Colors.red,
                                 onPressed: () {

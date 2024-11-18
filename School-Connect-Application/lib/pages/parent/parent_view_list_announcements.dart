@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:scs/consts/constans.dart';
 import 'package:scs/misc/constants.dart';
 import 'package:scs/models/announcement/announcement.dart';
+import 'package:scs/models/learner/learner.dart';
+import 'package:scs/models/learnerparent/learnerparent.dart';
 import 'package:scs/models/parent/parent.dart';
 import 'package:scs/models/principal/principal.dart';
 import 'package:scs/provider/login_provider.dart';
@@ -23,6 +25,8 @@ class ParentsAnnouncementsPage extends StatefulWidget {
 class _ParentsAnnouncementsPagePageState
     extends State<ParentsAnnouncementsPage> {
   late HttpService http;
+  List<LearnerParent> learners = [];
+  Learner learner = Learner();
 
   @override
   void initState() {
@@ -95,16 +99,13 @@ class _ParentsAnnouncementsPagePageState
                                 context, RouteManagerProvider.dannounce);
                           },
                           child: AnnouncementTile(
-                            from:
-                                // The commented one is to be used when NP are set
-                                "${announcement.title}",
+                            from: "${announcement.title}",
                             message: announcement.content ?? "No content",
-                            seen: false,
-                            pending: principal.id != null
+                            seen: announcement.viewedRecipients!
+                                    .contains(parent.id.toString())
                                 ? true
-                                : false, // You can manage the pending logic here
-                            editIcon: IconButton(
-                                onPressed: () {}, icon: Icon(Icons.edit)),
+                                : false,
+                            pending: principal.id != null ? true : false,
                             delIcon: IconButton(
                                 onPressed: () {}, icon: Icon(Icons.delete)),
                           ),
@@ -134,12 +135,18 @@ class _ParentsAnnouncementsPagePageState
           setState(() {
             parent = Parent.fromJson(result);
 
+            learners = parent.children!;
+
+            for (int i = 0; i <= learners.length - 1; i++) {
+              learner = learners[i].learner!;
+            }
+
             log("Mapped SystemAdmin: Name: ${parent.name}, Email: ${parent.emailAddress}, ID: ${parent.id}");
             isLoading = false;
           });
         }
 
-        getAnnouncements("");
+        getAnnouncements("Announcement/GetAnnouncementsByTeacherId?id=");
       } else {
         log("There is a problem, statusCode ${response.statusCode}, message ${response.statusMessage}");
         setState(() {
@@ -157,6 +164,7 @@ class _ParentsAnnouncementsPagePageState
 
   Future<void> getAnnouncements(String url) async {
     // String? token = Provider.of<LoginProvider>(context, listen: false).token;
+
     log("Fetching announcements");
 
     try {
@@ -164,7 +172,9 @@ class _ParentsAnnouncementsPagePageState
         isLoading = true;
       });
 
-      // Use principal.schoolID directly
+      if (learner.clas != null) {
+        String token = learner.clas!.mainTeacherId.toString();
+      }
       Response response = await http.getRequest("${http.baseUrl}$url");
 
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
@@ -188,26 +198,6 @@ class _ParentsAnnouncementsPagePageState
       setState(() {
         isLoading = false;
       });
-    }
-  }
-
-  Future<void> deleteAnnouncement(int? id) async {
-    try {
-      Response response = await http.deleteRequest(
-          "${http.baseUrl}Announcement/Delete?announcementId=$id");
-      if (response.statusCode! >= 200 && response.statusCode! <= 299) {
-        log("Announcement made");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Announcement has been deleted"),
-            backgroundColor: Colors.green,
-          ),
-        );
-        await getAnnouncements(
-            "Announcement/GetAnnouncementsByTeacherId?id=${principal.id}");
-      }
-    } on DioException catch (e) {
-      log("Put me into your blody arms${e.response!.data}");
     }
   }
 }

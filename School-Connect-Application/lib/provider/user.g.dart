@@ -15,12 +15,17 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       role: json['role'] as String?,
       emailAddress: json['emailAddress'] as String?,
       phoneNumber: (json['phoneNumber'] as num?)?.toInt(),
-    )..title = json['title'] as String?;
+    )
+      ..title = json['title'] as String?
+      ..profileImageBase64 = json['profileImageBase64'] as String?
+      ..profileImageType = json['profileImageType'] as String?;
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'profileImage': instance.profileImage,
+      'profileImageBase64': instance.profileImageBase64,
+      'profileImageType': instance.profileImageType,
       'name': instance.name,
       'surname': instance.surname,
       'gender': instance.gender,
